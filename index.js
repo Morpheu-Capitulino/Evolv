@@ -49,5 +49,5 @@ app.use('/graphql', expressMiddleware(server, {
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`🚀 API rodando na porta ${PORT}`);
+  console.log(`API rodando na porta ${PORT}`);
 });

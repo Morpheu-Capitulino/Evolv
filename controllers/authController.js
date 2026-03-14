@@ -33,8 +33,7 @@ export const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ error: "Credenciais inválidas" });
     }
-
-    // Equivalente ao TokenService.java
+    
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
     return res.status(200).json({ token, userId: user._id });
   } catch (error) {
