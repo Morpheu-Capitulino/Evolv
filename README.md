@@ -3,15 +3,11 @@
 Bem-vindo ao repositório oficial do Evolv Backend API. 
 O Evolv é um ecossistema digital inteligente focado na gestão de treinos, evolução corporal e engajamento social em academias. 
 
-Este projeto atua como o motor central da plataforma, utilizando uma arquitetura moderna que mescla a simplicidade do REST (para autenticação) com o poder e a flexibilidade do GraphQL (para gestão e tráfego de dados complexos).
-
-Projeto idealizado, arquitetado e mantido pela Virtana.
+Este projeto atua como o motor central da plataforma, utilizando uma arquitetura moderna que mescla a simplicidade do REST (para autenticação) com o poder e a flexibilidade do GraphQL
 
 ---
 
 ## Stack Tecnológica
-
-O sistema foi inteiramente refatorado de Java/Spring Boot para o ecossistema JavaScript, visando alta performance de I/O e alinhamento total com o front-end.
 
 * Runtime: Node.js (ES Modules)
 * Framework Web: Express.js
@@ -34,29 +30,6 @@ A API está dividida em 6 módulos principais:
 6. Social (GraphQL): Sistema de amizades conectando diferentes contas da plataforma.
 
 ---
-
-## Arquitetura do Projeto 
-
-O código foi desenhado visando manutenibilidade e separação clara de responsabilidades:
-
-```text
-evolv-node/
-├── index.js                 # Ponto de entrada, Configurações do Express e Apollo Server
-├── package.json             # Dependências e scripts de execução
-├── .env                     # Variáveis de ambiente (Mantido para avaliação Plug & Play)
-├── controllers/
-│   └── authController.js    # Lógica REST para Login e Registro
-├── graphql/
-│   ├── typeDefs.js          # O "Contrato" (Schema) da API. Define Queries e Mutations.
-│   └── resolvers.js         # O "Cérebro". Lógica de negócios e chamadas ao banco.
-└── models/                  # Schemas do Mongoose (Mapeamento do Banco de Dados)
-    ├── BodyMeasurement.js
-    ├── Exercise.js
-    ├── User.js
-    └── Workout.js
-
- ---
-
 ## Segurança e Integridade de Dados (Blindagem)
 
 Diferente de bancos SQL tradicionais, o MongoDB é um banco NoSQL. Para garantir a integridade dos dados, o Evolv implementa validações de chaves estrangeiras via software diretamente nos Resolvers do GraphQL:
@@ -67,7 +40,7 @@ Diferente de bancos SQL tradicionais, o MongoDB é um banco NoSQL. Para garantir
 
 ---
 
-## Como Rodar o Projeto (Guia Acadêmico - Plug & Play)
+## Como Rodar o Projeto
 
 AVISO PARA AVALIAÇÃO: Este projeto foi configurado para ser 100% Plug and Play visando facilitar a correção. O banco de dados já está hospedado em produção (MongoDB Atlas) e o arquivo .env com as credenciais não foi incluído no .gitignore propositalmente. Não é necessária nenhuma instalação local de banco de dados.
 
@@ -89,8 +62,6 @@ AVISO PARA AVALIAÇÃO: Este projeto foi configurado para ser 100% Plug and Play
 
 O repositório inclui um arquivo chamado Evolv.json. Trata-se de uma Collection completa com todas as requisições prontas. Importe este arquivo no seu Postman.
 
-O "Caminho Feliz" (Siga esta ordem exata):
-
 Nota: Por se tratar de um banco de dados real na nuvem, rotas de listagem podem retornar [] (vazio) caso nenhum dado tenha sido cadastrado ainda.
 
 1. A Chave de Acesso: Vá em "1. Autenticação", abra "1.1 Register" e envie para criar uma conta. Depois, vá em "1.2 Login" e envie. Copie o token que aparecerá na resposta.
@@ -99,3 +70,23 @@ Nota: Por se tratar de um banco de dados real na nuvem, rotas de listagem podem 
 4. Alimentando o Sistema: Vá na pasta "3. Catálogo" e crie um exercício (Ex: Supino). Copie o ID gerado para ele.
 5. O Coração do App: Vá na pasta "4. Treinos", abra a requisição de "Registrar Novo Treino" e cole o seu ID de Usuário e o ID do Exercício nos locais indicados. Envie para salvar o treino no banco.
 6. Inteligência Artificial (Evolução): Vá na pasta "5. Medidas", crie uma medida com data antiga (peso e gordura altos), copie o ID. Crie outra medida com a data de hoje (peso e gordura mais baixos), copie o ID. Por fim, rode a rota "5.3 Comparar Evolução" inserindo os dois IDs para ver o sistema calcular o progresso e retornar o feedback.
+
+## Arquitetura do Projeto 
+
+O código foi desenhado visando manutenibilidade e separação clara de responsabilidades:
+
+```text
+evolv-node/
+├── index.js                 # Ponto de entrada, Configurações do Express e Apollo Server
+├── package.json             # Dependências e scripts de execução
+├── .env                     # Variáveis de ambiente (Mantido para avaliação Plug & Play)
+├── controllers/
+│   └── authController.js    # Lógica REST para Login e Registro
+├── graphql/
+│   ├── typeDefs.js          # O "Contrato" (Schema) da API. Define Queries e Mutations.
+│   └── resolvers.js         # O "Cérebro". Lógica de negócios e chamadas ao banco.
+└── models/                  # Schemas do Mongoose (Mapeamento do Banco de Dados)
+    ├── BodyMeasurement.js
+    ├── Exercise.js
+    ├── User.js
+    └── Workout.js
