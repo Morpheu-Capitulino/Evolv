@@ -1,0 +1,230 @@
+{
+	"info": {
+		"name": "Evolv - Sistema Completo (Fase 1)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Autenticação (REST)",
+			"item": [
+				{
+					"name": "1.1 Register (Novo Usuário)",
+					"request": {
+						"method": "POST",
+						"url": "http://localhost:8080/api/auth/register",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Morpheu Capitulino\",\n    \"email\": \"morpheu@evolv.com\",\n    \"password\": \"Evolv2026\"\n}",
+							"options": { "raw": { "language": "json" } }
+						}
+					}
+				},
+				{
+					"name": "1.2 Login (Gera Token)",
+					"request": {
+						"method": "POST",
+						"url": "http://localhost:8080/api/auth/login",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"morpheu@evolv.com\",\n    \"password\": \"Evolv2026\"\n}",
+							"options": { "raw": { "language": "json" } }
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Gerenciamento de Usuários",
+			"item": [
+				{
+					"name": "2.1 Listar Todos os Usuários (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  getAllUsers {\n    id\n    name\n    email\n  }\n}"
+							}
+						}
+					}
+				},
+				{
+					"name": "2.2 Atualizar Meus Dados",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\n  updateUser(id: \"SEU_ID_AQUI\", name: \"Morpheu Atualizado\", email: \"novo@evolv.com\") {\n    id\n    name\n    email\n  }\n}"
+							}
+						}
+					}
+				},
+				{
+					"name": "2.3 Excluir Minha Conta",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\n  deleteUser(id: \"SEU_ID_AQUI\")\n}"
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Catálogo de Exercícios",
+			"item": [
+				{
+					"name": "3.1 Criar Novo Exercício",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\n  createExercise(name: \"Supino Reto\", muscleGroup: \"Peitoral\", videoUrl: \"https://youtube.com/exemplo\") {\n    id\n    name\n    muscleGroup\n  }\n}"
+							}
+						}
+					}
+				},
+				{
+					"name": "3.2 Listar Todos os Exercícios",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  getAllExercises {\n    id\n    name\n    muscleGroup\n  }\n}"
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Treinos (Workouts)",
+			"item": [
+				{
+					"name": "4.1 Registrar Novo Treino",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\n  createWorkout(input: {\n    userId: \"SEU_ID_DE_USUARIO_AQUI\",\n    workoutDate: \"2026-03-12T10:00:00\",\n    logs: [\n      { exerciseId: \"ID_DO_EXERCICIO_AQUI\", sets: 4, reps: 10, weight: 60.0 }\n    ]\n  }) {\n    id\n    userId\n    workoutDate\n    logs {\n      exerciseId\n      weight\n    }\n  }\n}"
+							}
+						}
+					}
+				},
+				{
+					"name": "4.2 Ver Meus Treinos",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  getUserWorkouts(userId: \"SEU_ID_DE_USUARIO_AQUI\") {\n    id\n    workoutDate\n    logs {\n      exerciseId\n      sets\n      weight\n    }\n  }\n}"
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Evolução Corporal (Medidas)",
+			"item": [
+				{
+					"name": "5.1 Adicionar Medida Corporal",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\n  addMeasurement(userId: \"SEU_ID_DE_USUARIO_AQUI\", weight: 85.5, height: 1.80, bodyFatPercentage: 22.0, date: \"2026-02-01\") {\n    id\n    weight\n    bodyFatPercentage\n    date\n  }\n}"
+							}
+						}
+					}
+				},
+				{
+					"name": "5.2 Ver Meu Histórico de Medidas",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  getUserMeasurements(userId: \"SEU_ID_DE_USUARIO_AQUI\") {\n    id\n    date\n    weight\n    bodyFatPercentage\n  }\n}"
+							}
+						}
+					}
+				},
+				{
+					"name": "5.3 Comparar Evolução (Antes e Depois)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  compareMeasurements(m1Id: \"ID_DA_MEDIDA_ANTIGA\", m2Id: \"ID_DA_MEDIDA_NOVA\") {\n    weightDifference\n    bodyFatDifference\n    evolutionMessage\n  }\n}"
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Social (Amigos)",
+			"item": [
+				{
+					"name": "6.1 Adicionar Amigo",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\n  addFriend(userId: \"SEU_ID_DE_USUARIO_AQUI\", friendId: \"ID_DO_AMIGO_AQUI\") {\n    id\n    name\n  }\n}"
+							}
+						}
+					}
+				},
+				{
+					"name": "6.2 Listar Meus Amigos",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" } ],
+						"url": "http://localhost:8080/graphql",
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  getFriends(userId: \"SEU_ID_DE_USUARIO_AQUI\") {\n    id\n    name\n    email\n  }\n}"
+							}
+						}
+					}
+				}
+			]
+		}
+	]
+}
