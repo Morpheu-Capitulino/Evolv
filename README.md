@@ -13,7 +13,7 @@ Projeto idealizado, arquitetado e mantido pela Virtana.
 
 ## Stack Tecnológica
 
-O sistema foi inteiramente refatorado de Java/Spring Boot para o ecossistema JavaScript, visando alta performance de I/O e alinhamento total com o front-end.
+
 
 Tecnologias utilizadas:
 
