@@ -1,0 +1,11 @@
+# Dependências do Node (Isso deixaria o repositório gigante)
+node_modules/
+
+# Logs de erro locais
+logs
+*.log
+npm-debug.log*
+
+# Arquivos de Sistema Operacional
+.DS_Store
+Thumbs.db
