@@ -1,122 +1,95 @@
-Evolv — Backend API (Node.js & GraphQL) | Fase 1
+# Evolv — Backend API (Node.js & GraphQL) | Fase 1
 
 Bem-vindo ao repositório oficial do Evolv Backend API.
-
 O Evolv é um ecossistema digital inteligente focado na gestão de treinos, evolução corporal e engajamento social em academias.
 
-Este projeto funciona como o motor central da plataforma, utilizando uma arquitetura moderna que combina:
+Este projeto atua como o motor central da plataforma, utilizando uma arquitetura moderna que mescla:
 
-a simplicidade do REST para autenticação
+a simplicidade do REST (para autenticação)
 
-com o poder e a flexibilidade do GraphQL para gerenciamento e tráfego de dados complexos
+com o poder e a flexibilidade do GraphQL (para gestão e tráfego de dados complexos)
 
 Projeto idealizado, arquitetado e mantido pela Virtana.
 
-🧱 Stack Tecnológica
+## Stack Tecnológica
 
-Tecnologias utilizadas no desenvolvimento da API:
+O sistema foi inteiramente refatorado de Java/Spring Boot para o ecossistema JavaScript, visando alta performance de I/O e alinhamento total com o front-end.
 
-Runtime
+Tecnologias utilizadas:
 
-Node.js (ES Modules)
+Runtime: Node.js (ES Modules)
 
-Framework Web
+Framework Web: Express.js
 
-Express.js
+API de Dados: Apollo Server (GraphQL v5) + @as-integrations/express4
 
-API de Dados
+Banco de Dados: MongoDB Atlas (DBaaS na Nuvem)
 
-Apollo Server (GraphQL v5)
+ODM (Object Data Modeling): Mongoose
 
-@as-integrations/express4
-
-Banco de Dados
-
-MongoDB Atlas (DBaaS na nuvem)
-
-ODM (Object Data Modeling)
-
-Mongoose
-
-Segurança & Criptografia
+Segurança & Criptografia:
 
 Autenticação via JWT (JSON Web Tokens)
 
 BcryptJS para hash de senha
 
-🧩 Domínios de Negócio & Funcionalidades
+## Domínios de Negócio & Funcionalidades
 
-A API está organizada em 6 módulos principais:
+A API está dividida em 6 módulos principais:
 
-1️⃣ Autenticação (REST)
+### 1. Autenticação (REST)
 
-Sistema responsável pelo acesso seguro à plataforma.
+Registro seguro com hash de senha e Login com geração de Token JWT válido por 2 horas.
 
-Funcionalidades:
+### 2. Usuários (GraphQL)
 
-Registro de usuários com hash seguro de senha
+Gestão completa de perfis:
 
-Login com geração de Token JWT válido por 2 horas
+listagem
 
-2️⃣ Usuários (GraphQL)
+atualização
 
-Gerenciamento completo de perfis de usuários.
+deleção
 
-Operações disponíveis:
+Operações CRUD completas.
 
-Listagem
-
-Atualização
-
-Exclusão
-
-Implementação de CRUD completo.
-
-3️⃣ Catálogo de Exercícios (GraphQL)
+### 3. Catálogo de Exercícios (GraphQL)
 
 Base de dados de exercícios contendo:
 
-organização por grupo muscular
+divisão por grupo muscular
 
-links de vídeo demonstrando a execução correta
+links em vídeo para execução correta
 
-4️⃣ Treinos / Workouts (GraphQL)
+### 4. Treinos / Workouts (GraphQL)
 
-Sistema de registro de treinos vinculados a usuários.
+Registro diário de treinos vinculados a um usuário, contendo:
 
-Cada treino pode conter:
-
-histórico de séries
+histórico detalhado de séries
 
 repetições
 
-carga utilizada
+carga
 
 Com validação relacional entre entidades.
 
-5️⃣ Evolução Corporal (GraphQL)
+### 5. Evolução Corporal (GraphQL)
 
-Registro de medidas corporais e análise de progresso físico.
+Registro de medidas corporais e um módulo de Inteligência do Sistema que:
 
-O sistema permite:
+compara avaliações físicas (Antes vs Depois)
 
-comparar avaliações físicas (antes vs depois)
+retorna cálculos matemáticos de evolução
 
-gerar cálculos de evolução corporal
+gera mensagens motivacionais de progresso
 
-retornar mensagens de feedback motivacional
+### 6. Social (GraphQL)
 
-6️⃣ Social (GraphQL)
+Sistema de amizades, permitindo conexão entre diferentes contas da plataforma.
 
-Sistema de relacionamento entre usuários.
+## Arquitetura do Projeto
 
-Funcionalidade principal:
-
-conexão de amizades entre contas da plataforma
-
-🏗 Arquitetura do Projeto
-
-O projeto foi estruturado priorizando:
+O código foi desenhado visando:
 
 manutenibilidade
 
@@ -124,208 +97,161 @@ escalabilidade
 
 separação clara de responsabilidades
 
+```text
 evolv-node/
-├── index.js                 # Ponto de entrada, configuração do Express e Apollo Server
-├── package.json             # Dependências e scripts do projeto
-├── .env                     # Variáveis de ambiente (incluído para avaliação Plug & Play)
-
+├── index.js                 # Ponto de entrada, Configurações do Express e Apollo Server
+├── package.json             # Dependências e scripts de execução
+├── .env                     # Variáveis de ambiente (Mantido para avaliação Plug & Play)
+│
 ├── controllers/
-│   └── authController.js    # Lógica REST para login e registro
-
+│   └── authController.js    # Lógica REST para Login e Registro
+│
 ├── graphql/
-│   ├── typeDefs.js          # Schema GraphQL (Queries e Mutations)
-│   └── resolvers.js         # Lógica de negócio e integração com banco
-
-└── models/                  # Schemas Mongoose
+│   ├── typeDefs.js          # O "Contrato" (Schema) da API. Define Queries e Mutations.
+│   └── resolvers.js         # O "Cérebro". Lógica de negócios e chamadas ao banco.
+│
+└── models/                  # Schemas do Mongoose (Mapeamento do Banco de Dados)
     ├── BodyMeasurement.js
     ├── Exercise.js
     ├── User.js
     └── Workout.js
-🔐 Segurança e Integridade de Dados
+```
 
-Embora o MongoDB seja um banco NoSQL, o Evolv implementa mecanismos de validação diretamente nos Resolvers do GraphQL para garantir integridade dos dados.
+## Segurança e Integridade de Dados
 
-✔ Prevenção de registros inválidos
+Diferente de bancos SQL tradicionais, o MongoDB é um banco NoSQL.
 
-Não é possível registrar:
+Para garantir a integridade dos dados, o Evolv implementa validações de chaves estrangeiras via software diretamente nos Resolvers do GraphQL.
 
-treinos
+### Prevenção de Fantasmas
 
-medidas corporais
+É impossível registrar um treino ou uma medida corporal para um usuário que não existe no banco.
 
-para usuários inexistentes no banco.
+### Catálogo Estrito
 
-✔ Catálogo de exercícios validado
+Um treino só é salvo se 100% dos exercícios enviados pelo Front-end existirem previamente na coleção de Exercícios do Evolv.
 
-Um treino só pode ser salvo se todos os exercícios enviados pelo Front-end existirem previamente no catálogo de exercícios.
+### GraphQL Status Code
 
-✔ Tratamento de erros GraphQL
+Requisições inválidas ou dados inexistentes retornam uma estrutura de errors clara no JSON, permitindo fácil tratamento no Front-end e seguindo o padrão ouro de APIs GraphQL.
 
-Requisições inválidas retornam uma estrutura clara no JSON utilizando o campo:
+## Como Rodar o Projeto
 
-errors
+### AVISO PARA AVALIAÇÃO
 
-Isso permite tratamento adequado no front-end, seguindo as boas práticas de APIs GraphQL.
+Este projeto foi configurado para ser 100% Plug and Play, visando facilitar a correção.
 
-▶ Como Rodar o Projeto
+O banco de dados já está hospedado em produção (MongoDB Atlas).
 
-⚠ AVISO PARA AVALIAÇÃO
+O arquivo .env com as credenciais não foi incluído no .gitignore propositalmente.
 
-Este projeto foi configurado para ser 100% Plug and Play, facilitando testes e correção.
+Não é necessária nenhuma instalação local de banco de dados.
 
-O banco de dados está hospedado em MongoDB Atlas
+### 1. Pré-requisitos
 
-O arquivo .env já está incluído no projeto
+Node.js instalado na máquina (Recomendado v18+)
 
-Não é necessário instalar banco de dados local
+Postman (para testar as requisições)
 
-1️⃣ Pré-requisitos
+### 2. Subindo o Servidor Local
 
-Antes de iniciar, é necessário possuir:
+Abra o terminal na raiz da pasta evolv-node
 
-Node.js instalado (recomendado v18+)
-
-Postman para testes das requisições
-
-2️⃣ Subindo o Servidor Local
-
-Abra o terminal na pasta do projeto:
+Instale todas as dependências:
 
 npm install
 
-Depois inicie o servidor:
+Inicie o servidor em modo de desenvolvimento (com hot-reload):
 
 npm run dev
 
-Se tudo estiver correto, o terminal exibirá:
+Se a configuração estiver correta, o terminal exibirá:
 
 confirmação de conexão com o MongoDB
 
 a porta em que a API está rodando
 
-🧪 Testando a API
+## Guia de Testes da API
 
-O repositório inclui um arquivo chamado:
+O repositório inclui um arquivo chamado Evolv.json.
 
-Evolv.json
+Trata-se de uma Collection completa com todas as requisições prontas.
+Importe este arquivo no Postman.
 
-Este arquivo contém uma collection completa de requisições para o Postman, com todas as rotas da API já configuradas.
+Nota:
+Por se tratar de um banco de dados real na nuvem, rotas de listagem podem retornar [] (vazio) caso nenhum dado tenha sido cadastrado ainda.
 
-Importação no Postman
+### 1. A Chave de Acesso
 
-Para começar os testes:
+Vá em "1. Autenticação"
 
-Abra o Postman
+Abra "1.1 Register" e envie para criar uma conta
 
-Clique em Import
+Depois vá em "1.2 Login" e envie
 
-Selecione o arquivo Evolv.json localizado no projeto
+Copie o token que aparecerá na resposta
 
-Importe a collection
+### 2. Configuração Global
 
-Após importar, todas as requisições da API estarão prontas para uso.
+No Postman:
 
-🔑 Fluxo recomendado de testes
-1. Criar conta e obter Token
+Clique na pasta raiz da Collection
+"Evolv - Sistema Completo"
 
-Vá na pasta:
+Acesse a aba Variables
 
-1. Autenticação
+Cole o seu token na variável correspondente e salve.
 
-Execute:
+Isso autenticará todas as chamadas seguintes automaticamente.
 
-1.1 Register
+### 3. Identificação
 
-1.2 Login
+Vá em "2. Gerenciamento de Usuários"
 
-Copie o token JWT retornado na resposta.
+Rode a listagem
 
-2. Configurar autenticação global
+Copie o seu ID
 
-Na collection do Postman:
+### 4. Alimentando o Sistema
 
-Evolv - Sistema Completo
+Vá na pasta "3. Catálogo"
 
-Abra a aba Variables
+Crie um exercício (Ex: Supino)
 
-Cole o token na variável correspondente
+Copie o ID gerado
 
-Salve
+### 5. O Coração do App
 
-Isso autenticará automaticamente todas as requisições seguintes.
+Vá na pasta "4. Treinos"
 
-3. Obter ID do usuário
+Abra a requisição "Registrar Novo Treino"
 
-Vá em:
+Cole:
 
-2. Gerenciamento de Usuários
+ID do Usuário
 
-Execute a listagem e copie o ID do usuário criado.
+ID do Exercício
 
-⚠ Importante
+Envie para salvar o treino no banco
 
-Sempre que for executar operações como:
+### 6. Inteligência Artificial (Evolução)
 
-registrar treinos
+Vá na pasta "5. Medidas"
 
-registrar medidas
+Crie uma medida com data antiga
+(peso e gordura mais altos)
 
-adicionar amigos
+Copie o ID
 
-realizar consultas
+Crie outra medida com data atual
+(peso e gordura mais baixos)
 
-é necessário atualizar manualmente o userId no body da requisição com o ID correto do usuário.
+Copie o ID
 
-4. Criar exercício
-
-Vá na pasta:
-
-3. Catálogo
-
-Crie um exercício (exemplo: Supino) e copie o ID gerado.
-
-5. Registrar treino
-
-Vá em:
-
-4. Treinos
-
-Abra a requisição Registrar Novo Treino.
-
-No body da requisição, insira:
-
-ID do usuário
-
-ID do exercício
-
-Envie a requisição para salvar o treino no banco.
-
-6. Comparar evolução corporal
-
-Vá em:
-
-5. Medidas
-
-Fluxo:
-
-1️⃣ Crie uma medida com data antiga
-(peso e gordura maiores)
-
-2️⃣ Copie o ID da medida
-
-3️⃣ Crie outra medida com data atual
-(peso e gordura menores)
-
-4️⃣ Copie o ID
-
-5️⃣ Execute:
-
-5.3 Comparar Evolução
-
-Inserindo os dois IDs das medidas.
+Rode a rota "5.3 Comparar Evolução" inserindo os dois IDs.
 
 O sistema irá:
 
-calcular a evolução corporal
+calcular o progresso corporal
 
-retornar um feedback inteligente de progresso
+retornar o feedback inteligente de evolução
