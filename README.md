@@ -89,29 +89,32 @@ Sistema de amizades, permitindo conexão entre diferentes contas da plataforma.
 
 ## Arquitetura do Projeto
 
-O código foi desenhado visando:
-
-manutenibilidade
-
-escalabilidade
-
-separação clara de responsabilidades
+O projeto foi reestruturado seguindo o padrão de mercado, isolando o código-fonte na pasta `src` para garantir:
+* manutenibilidade
+* escalabilidade
+* separação clara de responsabilidades
 
 ```text
-evolv-node/
-├── index.js                 # Ponto de entrada, Configurações do Express e Apollo Server
-├── package.json             # Dependências e scripts de execução
-├── .env                     # Variáveis de ambiente (Mantido para avaliação Plug & Play)
+backend/
+├── .env                     # Variáveis de ambiente (incluído para avaliação Plug & Play)
+├── .gitignore               # Arquivos ignorados pelo Git
+├── Evolv.json               # Collection do Postman com todas as rotas
+├── package.json             # Dependências e scripts do projeto
+├── README.md                # Documentação principal
 │
-├── controllers/
-│   └── authController.js    # Lógica REST para Login e Registro
-│
-├── graphql/
-│   ├── typeDefs.js          # O "Contrato" (Schema) da API. Define Queries e Mutations.
-│   └── resolvers.js         # O "Cérebro". Lógica de negócios e chamadas ao banco.
-│
-└── models/                  # Schemas do Mongoose (Mapeamento do Banco de Dados)
-    ├── BodyMeasurement.js
-    ├── Exercise.js
-    ├── User.js
-    └── Workout.js
+└── src/                     # Código-fonte principal da aplicação
+    ├── index.js             # Ponto de entrada, configuração do Express e Apollo Server
+    │
+    ├── controllers/
+    │   └── authController.js    # Lógica REST para login e registro
+    │
+    ├── graphql/
+    │   ├── typeDefs.js          # Schema GraphQL (Queries e Mutations)
+    │   └── resolvers.js         # Lógica de negócio e integração com banco
+    │
+    └── models/                  # Schemas Mongoose
+        ├── BodyMeasurement.js
+        ├── Exercise.js
+        ├── User.js
+        └── Workout.js
+```
