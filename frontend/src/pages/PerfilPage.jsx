@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import axios from 'axios';
 import { 
-  User, Star, LogOut, Edit3, CheckCircle2, AlertTriangle, 
-  Activity, Flame, Dumbbell, Bell, Shield, Crown, Settings, 
-  ChevronRight, Key, Eye, EyeOff, Lock
+  Star, LogOut, Edit3, CheckCircle2, AlertTriangle, 
+  Crown, ChevronRight, Key, Eye, EyeOff, Lock
 } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import '../styles/PerfilPage.css';
@@ -43,7 +42,7 @@ export default function PerfilPage() {
   const [editForm, setEditForm] = useState({ nome: '', email: '' });
   const [passForm, setPassForm] = useState({ atual: '', nova: '', confirmar: '' });
   
-  // Visibilidade de Senhas (Olhinho)
+  // Visibilidade de Senhas
   const [showPassAtual, setShowPassAtual] = useState(false);
   const [showPassNova, setShowPassNova] = useState(false);
 
@@ -85,7 +84,7 @@ export default function PerfilPage() {
     updateUser({ variables: { id: userId, name: editForm.nome, email: editForm.email } });
   };
 
-  // LÓGICA DE ALTERAÇÃO DE SENHA (SEGURANÇA)
+  // LÓGICA DE ALTERAÇÃO DE SENHA (SEGURANÇA RESTAURADA)
   const handleSavePassword = async () => {
     if (!passForm.atual || !passForm.nova || !passForm.confirmar) {
       return mostrarAviso("Preencha todas as senhas.", "error");
@@ -99,7 +98,9 @@ export default function PerfilPage() {
 
     try {
       const token = localStorage.getItem('evolv_token');
-      await axios.post('http://localhost:8080/api/auth/change-password', {
+      // Utiliza o VITE_API_URL para manter o projeto Plug & Play
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      await axios.post(`${API_URL}/api/auth/change-password`, {
         userId,
         senhaAtual: passForm.atual,
         novaSenha: passForm.nova
@@ -123,8 +124,7 @@ export default function PerfilPage() {
 
   return (
     <div className="perfil-page fade-in">
-      
-      {/* TOAST DE AVISO (SUCESSO OU ERRO) */}
+    
       {toastMessage && (
         <div className={`toast-notification ${toastType === 'error' ? 'error-toast' : 'success-toast'}`}>
           {toastType === 'error' ? <AlertTriangle size={20} /> : <CheckCircle2 size={20} />}
@@ -165,7 +165,7 @@ export default function PerfilPage() {
         <div className="quick-stats-row fade-in">
           <div className="glass-card q-stat"><span className="q-label">Treinos</span><strong className="q-value">42</strong></div>
           <div className="glass-card q-stat"><span className="q-label">Sequência</span><strong className="q-value">5 <small>dias</small></strong></div>
-          <div className="glass-card q-stat" style={{borderColor: 'var(--evolv-green)'}}><span className="q-label">Volume</span><strong className="q-value">128 <small>Ton</small></strong></div>
+          <div className="glass-card q-stat"><span className="q-label">Volume</span><strong className="q-value">128 <small>Ton</small></strong></div>
         </div>
 
         {/* MENU DE DEFINIÇÕES E SEGURANÇA */}
@@ -173,7 +173,7 @@ export default function PerfilPage() {
           <h4 className="section-title-sm">A Minha Conta</h4>
           <div className="glass-card settings-list">
             
-            <div className="setting-item">
+            <div className="setting-item" onClick={() => mostrarAviso("O Plano Pro já está ativo!", "success")}>
               <div className="s-icon" style={{color: '#ffaa00'}}><Crown size={18} /></div>
               <span className="s-text">Plano Evolv Pro</span>
               <span className="s-status premium">Ativo</span>
@@ -186,18 +186,6 @@ export default function PerfilPage() {
               <ChevronRight size={18} color="var(--text-muted)" />
             </div>
 
-            <div className="setting-item">
-              <div className="s-icon" style={{color: 'var(--evolv-green)'}}><Activity size={18} /></div>
-              <span className="s-text">Metas e Foco</span>
-              <ChevronRight size={18} color="var(--text-muted)" />
-            </div>
-
-            <div className="setting-item">
-              <div className="s-icon" style={{color: '#00d2ff'}}><Bell size={18} /></div>
-              <span className="s-text">Notificações</span>
-              <ChevronRight size={18} color="var(--text-muted)" />
-            </div>
-
           </div>
         </div>
 
@@ -207,7 +195,6 @@ export default function PerfilPage() {
         <div className="spacer"></div>
       </div>
 
-      {/* MODAL DE EDIÇÃO DE PERFIL */}
       {showEditModal && (
         <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
           <div className="data-input-modal" onClick={(e) => e.stopPropagation()}>
@@ -234,7 +221,6 @@ export default function PerfilPage() {
         </div>
       )}
 
-      {/* MODAL DE SEGURANÇA E SENHA */}
       {showPasswordModal && (
         <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
           <div className="data-input-modal" onClick={(e) => e.stopPropagation()}>

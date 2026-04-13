@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, gql } from '@apollo/client';
 import { 
   CheckCircle2, Circle, ChevronRight, Play, Dumbbell, 
-  Clock, BrainCircuit, Activity, Lock, Calendar as CalendarIcon,
-  History, Square, Target
+  Clock, BrainCircuit, Activity, Calendar as CalendarIcon,
+  History, Square
 } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
@@ -14,25 +14,30 @@ const GET_TREINO_DATA = gql`
   query GetTreinoData($userId: ID!, $date: String!) {
     getMyMeasurements { id weight bodyFatPercentage arm waist thigh hip date }
     getAllExercises { id name }
-    me { id focus goal trainingDays } # Adicionámos 'goal'
+    me { id focus goal trainingDays }
     getUserWorkouts(userId: $userId, date: $date) {
       logs { exerciseId weight reps sets }
     }
   }
 `;
 
+const ROTINAS_FALLBACK = {
+  'A': { nome: 'Peito, Ombros e Tríceps', exercicios: [] },
+  'B': { nome: 'Costas e Bíceps', exercicios: [] },
+  'C': { nome: 'Pernas Completo', exercicios: [] },
+  'D': { nome: 'Core e Cardio', exercicios: [] }
+};
+
 export default function TreinoPage() {
   const navigate = useNavigate();
   const userId = localStorage.getItem('evolv_userId');
   
-  // Agenda e Tempo
   const [diasSemana, setDiasSemana] = useState([]);
   const [selectedDay, setSelectedDay] = useState(''); 
   const [todayDate, setTodayDate] = useState(''); 
   
-  // Treino e Interface
   const [activeTab, setActiveTab] = useState('A');
-  const [rotinas, setRotinas] = useState(null);
+  const [rotinas, setRotinas] = useState(ROTINAS_FALLBACK); 
   const [aiSchedule, setAiSchedule] = useState(null);
   const [isStarted, setIsStarted] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
@@ -54,19 +59,17 @@ export default function TreinoPage() {
     for (let i = 0; i <= 4; i++) {
       const d = new Date(hoje);
       d.setDate(hoje.getDate() + i);
-      const fullDate = d.toISOString().split('T')[0];
-      let diaNome = d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
       days.push({ 
-        dia: diaNome.charAt(0).toUpperCase() + diaNome.slice(1), 
+        dia: d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').charAt(0).toUpperCase() + d.toLocaleDateString('pt-BR', { weekday: 'short' }).substring(1,3), 
         numero: d.getDate(), 
-        fullDate: fullDate 
+        fullDate: d.toISOString().split('T')[0] 
       });
     }
     setDiasSemana(days);
   }, []);
 
   useEffect(() => {
-    if (data?.getAllExercises && data?.getMyMeasurements && diasSemana.length > 0) {
+    if (data?.getAllExercises && diasSemana.length > 0) {
       const getId = (nome) => data.getAllExercises.find(e => e.name === nome)?.id || "";
       
       const baseRotinas = {
@@ -92,21 +95,38 @@ export default function TreinoPage() {
         ]}
       };
 
-      const m = data.getMyMeasurements[0];
-      const objetivo = data.me?.goal || 'Geral'; 
-      const foco = data.me?.focus || 'Membros Superiores';
-      const deficit = m.bodyFatPercentage > 18 ? 'D' : (m.arm < 36 ? 'A' : 'C');
+      // 1. O QUE O ALUNO QUER MELHORAR:
+      const objetivo = data.me?.goal || 'Hipertrofia'; 
+      const foco = data.me?.focus || 'Superiores';
+      
+      // 2. O QUE O CORPO PRECISA:
+      const m = data.getMyMeasurements && data.getMyMeasurements.length > 0 ? data.getMyMeasurements[0] : null;
+      let deficit = 'A';
+      let necessidadeText = 'desenvolver membros superiores';
+      
+      if (m) {
+        if (m.bodyFatPercentage > 18) {
+          deficit = 'D';
+          necessidadeText = 'queima de gordura e fortalecimento do core';
+        } else if (m.arm < 36) {
+          deficit = 'A';
+          necessidadeText = 'desenvolver membros superiores';
+        } else {
+          deficit = 'C';
+          necessidadeText = 'focar nos membros inferiores';
+        }
+      }
       
       const schedule = {};
       diasSemana.forEach((d, i) => {
+        // 3. A MESCLAGEM INTELIGENTE: Alterna dia sim, dia não, entre a Necessidade e o Desejo (Foco)
         const tab = i % 2 === 0 ? deficit : (foco === 'Superiores' ? 'A' : 'B');
         
-        // CORREÇÃO: MENSAGEM DINÂMICA E MAIS DESCRITIVA
         let msg = "Plano híbrido de evolução contínua.";
         if (i === 0) {
-          msg = `IA Coach: Para o teu objetivo de **${objetivo}** com foco em **${foco}**, o plano de hoje é estruturado para ${deficit === 'D' ? "queima de gordura e core" : deficit === 'A' ? "desenvolver membros superiores" : "focar nos membros inferiores"}. Vamos lá!`;
+          msg = `Evolv AI Coach: O teu objetivo é **${objetivo}** com foco em **${foco}**. Mesclando isso com a necessidade atual do teu corpo, o plano de hoje foi estruturado para **${necessidadeText}**.`;
         } else if (i === 1) {
-          msg = "IA Coach: Próxima sessão focada no desenvolvimento de força e técnica.";
+          msg = `Evolv AI Coach: Amanhã voltaremos ao teu foco principal em força e técnica.`;
         }
         
         schedule[d.fullDate] = { tab, msg };
@@ -131,7 +151,7 @@ export default function TreinoPage() {
 
   const formatTime = (s) => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
 
-  if (loading && !rotinas) return <div className="center-all" style={{color:'#fff'}}><Activity className="spin" /> Sincronizando...</div>;
+  if (loading && rotinas === ROTINAS_FALLBACK) return <div className="center-all" style={{color:'#fff'}}><Activity className="spin" /> A sincronizar Evolv AI...</div>;
 
   return (
     <div className="treino-page fade-in">
@@ -142,15 +162,9 @@ export default function TreinoPage() {
       />
 
       <div className="treino-content main-scroll">
-        
-        {/* CALENDÁRIO STRIP */}
         <div className="calendar-strip">
           {diasSemana.map((item) => (
-            <div 
-              key={item.fullDate} 
-              className={`calendar-day ${selectedDay === item.fullDate ? 'active' : ''}`}
-              onClick={() => setSelectedDay(item.fullDate)}
-            >
+            <div key={item.fullDate} className={`calendar-day ${selectedDay === item.fullDate ? 'active' : ''}`} onClick={() => setSelectedDay(item.fullDate)}>
               <span className="day-name">{item.dia}</span>
               <span className="day-number">{item.numero}</span>
               {item.fullDate === todayDate && <div className="active-dot"></div>}
@@ -168,13 +182,8 @@ export default function TreinoPage() {
         {isStarted && selectedDay === todayDate && (
           <div className="glass-card dashboard-card active-dash fade-in">
             <div className="dash-top">
-              <div className="timer-display">
-                <Clock size={22} color="var(--evolv-green)" />
-                <span className="time pulse-text">{formatTime(timeElapsed)}</span>
-              </div>
-              <button className="action-circle-btn btn-pause" onClick={() => setIsStarted(false)}>
-                <Square fill="#000" size={18} />
-              </button>
+              <div className="timer-display"><Clock size={22} color="var(--evolv-green)" /><span className="time pulse-text">{formatTime(timeElapsed)}</span></div>
+              <button className="action-circle-btn btn-pause" onClick={() => setIsStarted(false)}><Square fill="#000" size={18} /></button>
             </div>
           </div>
         )}
@@ -187,30 +196,18 @@ export default function TreinoPage() {
           ))}
         </div>
 
-        {rotinas && (
+        {rotinas[activeTab] && rotinas[activeTab].exercicios.length > 0 && (
           <div className="exercicios-list fade-in">
             <div className="selected-workout-header" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-               <Dumbbell size={20} color="var(--evolv-green)" />
-               <h2>Treino {activeTab}</h2>
+               <Dumbbell size={20} color="var(--evolv-green)" /><h2>Treino {activeTab}</h2>
             </div>
-            
             <h3 className="workout-desc">{rotinas[activeTab].nome}</h3>
             
             {rotinas[activeTab].exercicios.map((ex) => {
               const concluidoReal = verificarConcluido(ex.id);
               return (
-                <div 
-                  key={ex.id} 
-                  className={`glass-card exercicio-item ${concluidoReal ? 'concluido' : ''}`}
-                  onClick={() => navigate(`/detalhes/${ex.id}`)}
-                >
-                  <div className="ex-icon">
-                    {concluidoReal ? (
-                      <CheckCircle2 size={30} color="var(--evolv-green)" fill="rgba(58, 181, 74, 0.2)" />
-                    ) : (
-                      <Circle size={30} color="var(--border-glass)" />
-                    )}
-                  </div>
+                <div key={ex.id} className={`glass-card exercicio-item ${concluidoReal ? 'concluido' : ''}`} onClick={() => navigate(`/detalhes/${ex.id}`)}>
+                  <div className="ex-icon">{concluidoReal ? <CheckCircle2 size={30} color="var(--evolv-green)" fill="rgba(58, 181, 74, 0.2)" /> : <Circle size={30} color="var(--border-glass)" />}</div>
                   <div className="ex-info">
                     <h3 style={{ textDecoration: concluidoReal ? 'line-through' : 'none' }}>{ex.nome}</h3>
                     <span className="detalhe-treino">{concluidoReal ? "✓ Registado" : ex.detalhe}</span>
@@ -224,16 +221,12 @@ export default function TreinoPage() {
 
         <div className="treino-actions">
           {selectedDay === todayDate && !isStarted && (
-            <button className="green-button start-btn" onClick={() => setIsStarted(true)}>
-              <Play fill="#000" size={20} /> INICIAR TREINO
-            </button>
+            <button className="green-button start-btn" onClick={() => setIsStarted(true)}><Play fill="#000" size={20} /> INICIAR TREINO</button>
           )}
         </div>
-
         <div className="spacer"></div>
       </div>
 
-      {/* MODAL DE HISTÓRICO */}
       {showHistoryModal && (
         <div className="modal-overlay" onClick={() => setShowHistoryModal(false)}>
           <div className="data-input-modal" onClick={e => e.stopPropagation()}>
@@ -252,7 +245,6 @@ export default function TreinoPage() {
           </div>
         </div>
       )}
-
       <BottomNav />
     </div>
   );

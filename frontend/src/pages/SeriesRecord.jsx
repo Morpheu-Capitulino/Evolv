@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
-import { ArrowLeft, Save, Play, Square, RotateCcw, Check, CheckCircle2, Zap, Target } from 'lucide-react';
+import { ArrowLeft, Save, Play, CheckCircle2, FastForward } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import '../styles/SeriesRecord.css';
 
-// QUERIES
 const GET_EX_FOR_RECORD = gql`
-  query GetExForRecord($id: ID!) {
-    getExercise(id: $id) { id name idealRest }
-  }
+  query GetExForRecord($id: ID!) { getExercise(id: $id) { id name idealRest } }
 `;
 
 const CREATE_WORKOUT = gql`
-  mutation CreateWorkout($input: CreateWorkoutInput!) {
-    createWorkout(input: $input) { id }
-  }
+  mutation CreateWorkout($input: CreateWorkoutInput!) { createWorkout(input: $input) { id } }
 `;
 
 export default function SeriesRecord() {
@@ -27,11 +22,12 @@ export default function SeriesRecord() {
   const [reps, setReps] = useState(10);
   const [serieAtual, setSerieAtual] = useState(1);
   const [tempoDescanso, setTempoDescanso] = useState(90);
-  const [timerAtivo, setTimerAtivo] = useState(false);
+  
+  const [isResting, setIsResting] = useState(false); 
   const [concluido, setConcluido] = useState(false);
 
   const { data, loading } = useQuery(GET_EX_FOR_RECORD, { variables: { id: exId } });
-  const [saveWorkout] = useMutation(CREATE_WORKOUT);
+  const [saveWorkout, { loading: saving }] = useMutation(CREATE_WORKOUT);
 
   useEffect(() => {
     if (data?.getExercise) setTempoDescanso(data.getExercise.idealRest || 90);
@@ -39,10 +35,13 @@ export default function SeriesRecord() {
 
   useEffect(() => {
     let int = null;
-    if (timerAtivo && tempoDescanso > 0) int = setInterval(() => setTempoDescanso(t => t - 1), 1000);
-    else if (tempoDescanso === 0) setTimerAtivo(false);
+    if (isResting && tempoDescanso > 0) {
+      int = setInterval(() => setTempoDescanso(t => t - 1), 1000);
+    } else if (tempoDescanso === 0) {
+      setIsResting(false); 
+    }
     return () => clearInterval(int);
-  }, [timerAtivo, tempoDescanso]);
+  }, [isResting, tempoDescanso]);
 
   const handleSalvarSerie = async () => {
     try {
@@ -59,7 +58,7 @@ export default function SeriesRecord() {
       if (serieAtual < 3) {
         setSerieAtual(serieAtual + 1);
         setTempoDescanso(data?.getExercise?.idealRest || 90);
-        setTimerAtivo(true);
+        setIsResting(true);
       } else {
         setConcluido(true);
       }
@@ -68,7 +67,7 @@ export default function SeriesRecord() {
     }
   };
 
-  if (loading) return <div className="series-record-page center-all">A carregar biometria...</div>;
+  if (loading) return <div className="series-record-page center-all">A carregar...</div>;
 
   return (
     <div className="series-record-page fade-in">
@@ -76,7 +75,7 @@ export default function SeriesRecord() {
         <button className="icon-back-btn" onClick={() => navigate(-1)}><ArrowLeft size={28} color="#fff" /></button>
         <div className="header-info">
           <h1 className="ex-title">{data?.getExercise?.name}</h1>
-          <span className="ex-subtitle">Registo em Tempo Real</span>
+          <span className="ex-subtitle">Série {serieAtual} de 3</span>
         </div>
       </header>
 
@@ -84,8 +83,18 @@ export default function SeriesRecord() {
         {concluido ? (
           <div className="glass-card success-card fade-in">
             <CheckCircle2 size={70} color="var(--evolv-green)" className="pulse-icon" />
-            <h2>Séries Guardadas no MongoDB!</h2>
-            <button className="green-button full-width mt-20" onClick={() => navigate(`/detalhes/${exId}`)}>VER EVOLUÇÃO</button>
+            <h2>Exercício Concluído!</h2>
+            <button className="green-button full-width mt-20" onClick={() => navigate(-1)}>VOLTAR AO TREINO</button>
+          </div>
+        ) : isResting ? (
+          <div className="rest-screen fade-in" style={{textAlign: 'center', marginTop: '40px'}}>
+             <h2 style={{color: 'var(--evolv-green)', marginBottom: '10px'}}>Descanso Ativo</h2>
+             <div className="timer-display-huge pulse-text" style={{fontSize: '4rem', fontWeight: 'bold', color: '#fff', margin: '30px 0'}}>
+                {Math.floor(tempoDescanso/60)}:{String(tempoDescanso%60).padStart(2,'0')}
+             </div>
+             <button className="btn-glass-outline" onClick={() => setIsResting(false)} style={{display: 'inline-flex', alignItems: 'center', gap: '8px'}}>
+               <FastForward size={18} /> PULAR DESCANSO
+             </button>
           </div>
         ) : (
           <div className="fade-in">
@@ -98,7 +107,6 @@ export default function SeriesRecord() {
                 </div>
              </div>
 
-             {/* PAINEL DE REPETIÇÕES RESTAURADO */}
              <div className="glass-card input-panel" style={{marginTop: '15px'}}>
                 <p className="panel-title">REPETIÇÕES</p>
                 <div className="stepper-modern">
@@ -108,14 +116,9 @@ export default function SeriesRecord() {
                 </div>
              </div>
 
-             <div className={`glass-card timer-panel ${timerAtivo ? 'timer-active-panel' : ''}`} style={{marginTop: '15px'}}>
-                <div className="timer-display-huge">{Math.floor(tempoDescanso/60)}:{String(tempoDescanso%60).padStart(2,'0')}</div>
-                <button className="green-button" onClick={() => setTimerAtivo(!timerAtivo)}>{timerAtivo ? "PAUSAR" : "INICIAR DESCANSO"}</button>
-             </div>
-
              <div className="bottom-action-area">
-                <button className="green-button save-btn" onClick={handleSalvarSerie}>
-                  <Save size={20} /> {serieAtual === 3 ? "FINALIZAR" : "GUARDAR SÉRIE " + serieAtual}
+                <button className="green-button save-btn" onClick={handleSalvarSerie} disabled={saving}>
+                  <Save size={20} /> {saving ? "A GUARDAR..." : "REGISTRAR SÉRIE"}
                 </button>
              </div>
           </div>

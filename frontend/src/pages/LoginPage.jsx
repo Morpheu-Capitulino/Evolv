@@ -79,7 +79,7 @@ export default function LoginPage() {
           <p className="evolv-tagline">Treino Híbrido & Competição</p>
         </div>
 
-       {/* AVISO IOS/SAFARI (Compacto & Full-Overview) */}
+       {/* AVISO IOS/SAFARI */}
         {showIOSPrompt && (
           <div className="pwa-install-card ios-compact fade-in">
             <button className="close-pwa-btn" onClick={() => setShowIOSPrompt(false)}>
@@ -138,7 +138,7 @@ export default function LoginPage() {
           </div>
 
           <p className="login-link">
-            Não tem conta? <span onClick={() => navigate('/register')}>Registe-se</span>
+            Não tem conta? <span onClick={() => navigate('/register')}>Registre-se</span>
           </p>
         </form>
 
