@@ -1,120 +1,96 @@
-# Evolv — Backend API (Node.js & GraphQL) | Fase 1
+# Evolv (Fase 1)
 
-Bem-vindo ao repositório oficial do Evolv Backend API.
-O Evolv é um ecossistema digital inteligente focado na gestão de treinos, evolução corporal e engajamento social em academias.
+Bem-vindo ao repositório oficial do **Evolv**. Este é um ecossistema digital inteligente focado na gestão de treinos, evolução corporal e engajamento social. O projeto foi idealizado e arquitetado pela **Virtana** para o programa Centelha 2026.
 
-Este projeto atua como o motor central da plataforma, utilizando uma arquitetura moderna que mescla:
+Este repositório contém o motor central (Backend API) e a interface de utilizador (Frontend PWA), utilizando uma arquitetura moderna que une a simplicidade do **REST** com a flexibilidade do **GraphQL**.
 
-a simplicidade do REST (para autenticação)
+---
 
-com o poder e a flexibilidade do GraphQL (para gestão e tráfego de dados complexos)
+## Guia de Instalação: Plug & Play
 
-Projeto idealizado, arquitetado e mantido pela Virtana.
+Este projeto foi configurado para funcionar imediatamente. **O banco de dados está na nuvem (MongoDB Atlas)**, eliminando a necessidade de configurações locais de base de dados para a avaliação.
 
-## Stack Tecnológica
+### Pré-requisitos
+* **Node.js** instalado (v18 ou superior)
+* Gerenciador de pacotes (`npm` ou `yarn`)
 
-O sistema foi inteiramente refatorado de Java/Spring Boot para o ecossistema JavaScript, visando alta performance de I/O e alinhamento total com o front-end.
+---
 
-Tecnologias utilizadas:
+### 1 Passo: Configurar o Backend (Servidor)
+Abra um terminal na pasta `backend`:
 
+1. Instale as dependências:
+   ```bash
+   npm install
+Inicie o servidor:
+
+Bash
+npm run dev
+Porta: http://localhost:8080
+
+Confirmação: Aguarde a mensagem 🔥 MongoDB Conectado! e 🚀 API do Evolv rodando na porta 8080.
+
+2️ Passo: Configurar o Frontend (Interface)
+Abra um segundo terminal na pasta frontend:
+
+Instale as dependências:
+
+Bash
+npm install
+Inicie a aplicação:
+
+Bash
+npm run dev
+Acesso: Abra o navegador em http://localhost:5173.
+
+Nota PWA: Para testar a instalação no telemóvel, utilize o Chrome (Android) ou Safari (iOS).
+
+🛠️ Stack Tecnológica
+Backend (Node.js & GraphQL)
 Runtime: Node.js (ES Modules)
 
-Framework Web: Express.js
+Framework: Express.js
 
-API de Dados: Apollo Server (GraphQL v5) + @as-integrations/express4
+API: Apollo Server (GraphQL v5) + @as-integrations/express4
 
 Banco de Dados: MongoDB Atlas (DBaaS na Nuvem)
 
-ODM (Object Data Modeling): Mongoose
+Segurança: Autenticação JWT com opção "Manter Conectado" e Criptografia BcryptJS.
 
-Segurança & Criptografia:
+Frontend (React & PWA)
+Framework: React.js via Vite
 
-Autenticação via JWT (JSON Web Tokens)
+Cliente API: Apollo Client (GraphQL)
 
-BcryptJS para hash de senha
+PWA: Vite PWA Plugin (Instalável e com suporte a offline)
 
-## Domínios de Negócio & Funcionalidades
+UI/UX: Design Glassmorphism (Midnight Blue & Gold), Ícones via Lucide-React.
 
-A API está dividida em 6 módulos principais:
+Domínios de Negócio & Funcionalidades
+Autenticação Inteligente (REST): Login com checkbox "Manter conectado" que estende a validade do token para 30 dias, adaptado para a persistência do iOS.
 
-### 1. Autenticação (REST)
+Checklist de Treino Automatizado (GraphQL): O sistema marca o exercício como concluído automaticamente assim que deteta o envio de uma carga para o banco de dados.
 
-Registro seguro com hash de senha e Login com geração de Token JWT válido por 2 horas.
+AI Coach (IA Híbrida): Algoritmo que analisa medidas corporais e objetivos (Hipertrofia/Cutting) para sugerir a rotina de treino ideal (A, B, C ou D).
 
-### 2. Usuários (GraphQL)
+Evolução & Performance: Registro de séries, repetições e carga com cálculo automático de 1RM e histórico detalhado.
 
-Gestão completa de perfis:
+Social: Sistema de amizades para conexão entre usuários da plataforma.
 
-listagem
-
-atualização
-
-deleção
-
-Operações CRUD completas.
-
-### 3. Catálogo de Exercícios (GraphQL)
-
-Base de dados de exercícios contendo:
-
-divisão por grupo muscular
-
-links em vídeo para execução correta
-
-### 4. Treinos / Workouts (GraphQL)
-
-Registro diário de treinos vinculados a um usuário, contendo:
-
-histórico detalhado de séries
-
-repetições
-
-carga
-
-Com validação relacional entre entidades.
-
-### 5. Evolução Corporal (GraphQL)
-
-Registro de medidas corporais e um módulo de Inteligência do Sistema que:
-
-compara avaliações físicas (Antes vs Depois)
-
-retorna cálculos matemáticos de evolução
-
-gera mensagens motivacionais de progresso
-
-### 6. Social (GraphQL)
-
-Sistema de amizades, permitindo conexão entre diferentes contas da plataforma.
-
-## Arquitetura do Projeto
-
-O projeto foi reestruturado seguindo o padrão de mercado, isolando o código-fonte na pasta `src` para garantir:
-* manutenibilidade
-* escalabilidade
-* separação clara de responsabilidades
-
-```text
+Arquitetura do Projeto
+Plaintext
 backend/
-├── .env                     # Variáveis de ambiente (incluído para avaliação Plug & Play)
-├── .gitignore               # Arquivos ignorados pelo Git
-├── Evolv.json               # Collection do Postman com todas as rotas
-├── package.json             # Dependências e scripts do projeto
-├── README.md                # Documentação principal
+├── .env                     # Variáveis de ambiente (Incluso para avaliação)
+├── src/
+│   ├── index.js             # Ponto de entrada (Express/Apollo)
+│   ├── controllers/         # Lógica REST para auth
+│   ├── graphql/             # typeDefs e resolvers
+│   └── models/              # Schemas Mongoose (User, Workout, Exercise, etc.)
 │
-└── src/                     # Código-fonte principal da aplicação
-    ├── index.js             # Ponto de entrada, configuração do Express e Apollo Server
-    │
-    ├── controllers/
-    │   └── authController.js    # Lógica REST para login e registro
-    │
-    ├── graphql/
-    │   ├── typeDefs.js          # Schema GraphQL (Queries e Mutations)
-    │   └── resolvers.js         # Lógica de negócio e integração com banco
-    │
-    └── models/                  # Schemas Mongoose
-        ├── BodyMeasurement.js
-        ├── Exercise.js
-        ├── User.js
-        └── Workout.js
-```
+frontend/
+├── public/                  # Logos e Assets do PWA
+├── src/
+│   ├── components/          # Componentes globais
+│   ├── pages/               # Ecrãs da aplicação
+│   └── lib/                 # Configuração do Apollo Client
+└── vite.config.js           # Configuração de PWA e Build
