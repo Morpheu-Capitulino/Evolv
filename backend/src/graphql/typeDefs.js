@@ -1,50 +1,103 @@
-export const typeDefs = `#graphql
-  type User { id: ID!, name: String, email: String, friendIds: [String] }
-  type Exercise { id: ID!, name: String, muscleGroup: String, videoUrl: String }
-  type WorkoutLog { exerciseId: String, sets: Int, reps: Int, weight: Float }
-  type Workout { id: ID!, userId: String, workoutDate: String, logs: [WorkoutLog] }
-  type BodyMeasurement { id: ID!, userId: String, weight: Float, height: Float, bodyFatPercentage: Float, date: String }
-  
-  type Comparison { weightDifference: Float, bodyFatDifference: Float, evolutionMessage: String }
-  type ProgressionData { workoutDate: String, maxWeight: Float, totalVolume: Float }
+import { gql } from 'apollo-server-express';
 
-  input WorkoutLogInput { exerciseId: String, sets: Int, reps: Int, weight: Float }
-  input CreateWorkoutInput { userId: String!, workoutDate: String, logs: [WorkoutLogInput]! }
+export const typeDefs = gql`
+  type User {
+    id: ID!
+    name: String!
+    email: String!
+    goal: String
+    focus: String
+    isPremium: Boolean
+    exercisesCompleted: Int
+    friendIds: [ID]
+    pendingRequestIds: [ID]
+    trainingDays: [String]
+  }
+
+  type Exercise {
+    id: ID!
+    name: String!
+    subtitle: String
+    muscleGroup: String
+    videoUrl: String
+    idealRest: Int
+  }
+
+  type Measurement {
+    id: ID!
+    userId: ID
+    weight: Float
+    height: Float
+    bodyFatPercentage: Float
+    arm: Float
+    waist: Float
+    thigh: Float
+    hip: Float
+    date: String
+  }
+
+  type ComparisonResult {
+    weightDifference: Float
+    bodyFatDifference: Float
+    evolutionMessage: String
+  }
+
+  type ProgressionData {
+    workoutDate: String
+    maxWeight: Float
+    totalVolume: Float
+  }
+
+  type Workout {
+    id: ID!
+    userId: ID
+    workoutDate: String
+    logs: [WorkoutLog]
+  }
+
+  type WorkoutLog {
+    exerciseId: String
+    weight: Float
+    reps: Int
+    sets: Int
+  }
+
+  input WorkoutLogInput {
+    exerciseId: String!
+    weight: Float!
+    reps: Int!
+    sets: Int!
+  }
+
+  input CreateWorkoutInput {
+    userId: ID!
+    workoutDate: String!
+    logs: [WorkoutLogInput]!
+  }
 
   type Query {
-    # UserController & FriendController
+    me: User
     getAllUsers: [User]
-    getFriends(userId: String!): [User]
-    
-    # ExerciseController
+    getFriends(userId: ID!): [User]
     getAllExercises: [Exercise]
-    
-    # WorkoutController
-    getUserWorkouts(userId: String!): [Workout]
-    
-    # MeasurementController & ProfileController
-    getUserMeasurements(userId: String!): [BodyMeasurement]
-    getMyMeasurements: [BodyMeasurement]
-    compareMeasurements(m1Id: String!, m2Id: String!): Comparison
-    
-    # EvolutionController
-    getExerciseProgression(exerciseId: String!): [ProgressionData]
+    getExercise(id: ID!): Exercise
+    getMyMeasurements: [Measurement]
+    getUserMeasurements(userId: ID!): [Measurement]
+    compareMeasurements(m1Id: ID!, m2Id: ID!): ComparisonResult
+    getUserWorkouts(userId: ID!, date: String): [Workout]
+    getExerciseProgression(exerciseId: ID!): [ProgressionData]
   }
 
   type Mutation {
-    # UserController & FriendController
-    updateUser(id: ID!, name: String, email: String): User
+    updateUser(id: ID!, name: String, email: String, goal: String, focus: String): User
     deleteUser(id: ID!): Boolean
-    addFriend(userId: String!, friendId: String!): User
-
-    # ExerciseController
+    addMeasurement(userId: ID!, weight: Float!, bodyFatPercentage: Float!): Measurement
+    addBodyMeasurement(weight: Float!, height: Float!, bodyFatPercentage: Float!, arm: Float, waist: Float, thigh: Float, hip: Float): Measurement
+    addFriend(userId: ID!, friendId: ID!): User
+    sendFriendRequest(userId: ID!, targetId: ID!): User
+    respondToRequest(userId: ID!, requesterId: ID!, accept: Boolean!): User
     createExercise(name: String!, muscleGroup: String!, videoUrl: String): Exercise
-    
-    # WorkoutController
+    finishWorkout(userId: ID!, exerciseCount: Int!): User
     createWorkout(input: CreateWorkoutInput!): Workout
-    
-    # MeasurementController & ProfileController
-    addMeasurement(userId: String!, weight: Float, height: Float, bodyFatPercentage: Float, date: String): BodyMeasurement
-    addBodyMeasurement(weight: Float!, height: Float!, bodyFatPercentage: Float!): BodyMeasurement
   }
 `;

@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700;800&family=Caveat:wght@700&display=swap');
+
+:root {
+  /* Cores Modernizadas */
+  --bg-dark: #090b0f; /* Fundo principal levemente azulado/escuro */
+  --bg-gradient: radial-gradient(circle at 50% 0%, #162218 0%, #090b0f 70%);
+  --bg-glass: rgba(255, 255, 255, 0.03); /* Efeito vidro */
+  --evolv-green: #3ab54a;
+  --evolv-green-glow: rgba(58, 181, 74, 0.4);
+  --text-light: #ffffff;
+  --text-muted: #8b92a5;
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-green-glass: rgba(58, 181, 74, 0.3);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-dark);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text-light);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Títulos ganham mais peso e presença */
+h1, h2, h3, h4, strong {
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: -0.5px;
+}
+
+/* Logo super premium com brilho */
+.evolv-logo {
+  font-family: 'Caveat', cursive;
+  color: var(--evolv-green);
+  text-shadow: 0 0 20px var(--evolv-green-glow);
+  text-align: center;
+}
+
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--border-green-glass);
+  transform: translateY(-2px);
+}
+
+/* Animação suave ao abrir as páginas */
+.fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(15px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

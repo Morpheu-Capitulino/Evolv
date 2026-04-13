@@ -1,0 +1,211 @@
+.home-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-bottom: 70px;
+}
+
+/* Header */
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 20px 15px 20px;
+}
+
+.user-greeting {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-pic-mini {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid var(--evolv-green);
+  background: #1a1a1a; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.greeting-text {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.greeting-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.mini-logo {
+  font-size: 2.2rem;
+  margin: 0;
+}
+
+.home-layout {
+  padding: 0 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.section-label {
+  font-size: 0.7rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin: 25px 0 10px 0;
+}
+
+.interactive-stats {
+  padding: 5px;
+  margin-top: 10px;
+}
+
+.stats-tabs {
+  display: flex;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  padding: 5px;
+  margin-bottom: 15px;
+}
+
+.stat-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 10px 0;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.stat-tab.active {
+  background: var(--border-green-glass);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.stats-grid {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0 15px 0;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-icon {
+  margin-bottom: 8px;
+}
+.green-glow { color: var(--evolv-green); filter: drop-shadow(0 0 8px var(--evolv-green-glow)); }
+.orange-glow { color: #ff6b00; filter: drop-shadow(0 0 8px rgba(255, 107, 0, 0.4)); }
+.gold-glow { color: #ffd700; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.4)); }
+
+.stat-box strong { font-size: 1.4rem; }
+.stat-box span { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+
+/* Animação rápida ao trocar a aba */
+.fade-in-fast { animation: fadeFast 0.3s ease-in forwards; }
+@keyframes fadeFast { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+/* Main CTA - Destaque absoluto */
+.main-cta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(145deg, rgba(20, 30, 22, 0.8) 0%, rgba(9, 11, 15, 0.8) 100%);
+  border: 1px solid var(--evolv-green);
+  cursor: pointer;
+}
+
+.main-cta:hover .play-btn {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px var(--evolv-green-glow);
+}
+
+.cta-badge {
+  display: inline-block;
+  background: var(--evolv-green);
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.cta-info h3 { font-size: 1.1rem; margin-bottom: 5px; }
+.cta-info .cta-desc { font-size: 0.8rem; color: var(--text-muted); }
+
+.play-btn {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: var(--evolv-green);
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Horizontal Scroll para cards de explorar */
+.horizontal-scroll {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scroll-snap-type: x mandatory;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.explore-card {
+  min-width: 140px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  scroll-snap-align: start;
+  cursor: pointer;
+}
+
+.explore-icon {
+  color: var(--evolv-green);
+  margin-bottom: 12px;
+}
+
+.explore-card h4 { font-size: 0.95rem; margin-bottom: 4px; }
+.explore-card span { font-size: 0.75rem; color: var(--text-muted); }
+
+/* Último Treino Compacto */
+.last-workout-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  cursor: pointer;
+}
+
+.lw-left h4 { font-size: 1rem; margin-bottom: 4px; }
+.lw-left span { font-size: 0.8rem; color: var(--text-muted); }
+
+.spacer { height: 40px; }

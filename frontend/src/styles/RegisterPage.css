@@ -1,0 +1,101 @@
+.register-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-image: url('../assets/hero.png'); 
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+/* O Overlay escuro reaproveitado do Login */
+.register-page .overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at center, rgba(9, 11, 15, 0.7) 0%, rgba(9, 11, 15, 0.98) 100%);
+  z-index: 1;
+}
+
+.register-content {
+  position: relative;
+  z-index: 2;
+  width: 90%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-glass);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid var(--border-glass);
+  border-radius: 24px;
+  padding: 30px 25px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+}
+
+.back-to-login {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.back-to-login:hover {
+  color: var(--evolv-green);
+}
+
+.mini-logo-register {
+  font-size: 2.8rem;
+  margin-bottom: 25px;
+  margin-top: 10px;
+}
+
+.register-form {
+  width: 100%;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.login-link span {
+  color: var(--evolv-green);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: all 0.2s;
+}
+
+.login-link span:hover {
+  text-shadow: 0 0 10px var(--evolv-green-glow);
+}
+
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 0;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.success-message h2 {
+  color: #fff;
+  margin: 15px 0 5px 0;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.success-message p {
+  color: var(--evolv-green);
+  font-size: 0.9rem;
+  font-weight: 600;
+}

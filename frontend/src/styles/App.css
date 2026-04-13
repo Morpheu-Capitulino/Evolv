@@ -1,0 +1,9 @@
+.mobile-container {
+  max-width: 414px; 
+  min-height: 100vh;
+  margin: 0 auto;
+  background-color: var(--bg-dark);
+  position: relative;
+  overflow-x: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}

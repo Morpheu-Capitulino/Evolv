@@ -1,16 +1,15 @@
 import mongoose from 'mongoose';
 
-const logSchema = new mongoose.Schema({
-  exerciseId: { type: String, required: true },
-  sets: { type: Number },
-  reps: { type: Number },
-  weight: { type: Number }
-});
-
 const workoutSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  workoutDate: { type: String, required: true },
-  logs: [logSchema]
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  workoutDate: { type: String, required: true }, // Formato YYYY-MM-DD
+  logs: [{
+    exerciseId: { type: String, required: true },
+    weight: Number,
+    reps: Number,
+    sets: Number,
+    timestamp: { type: Date, default: Date.now }
+  }]
 });
 
 export default mongoose.model('Workout', workoutSchema);

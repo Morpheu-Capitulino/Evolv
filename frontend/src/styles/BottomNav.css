@@ -1,0 +1,59 @@
+/* src/styles/BottomNav.css */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 414px; 
+  height: 70px;
+  
+  /* Efeito de Vidro Premium */
+  background: rgba(9, 11, 15, 0.85); 
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border-glass);
+  
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 20%;
+  padding-top: 5px;
+}
+
+.nav-item svg {
+  margin-bottom: 4px;
+  transition: all 0.3s ease;
+}
+
+/* O ESTILO DE QUANDO A ABA ESTÁ ATIVA (VERDE NEON) */
+.nav-item.active {
+  color: var(--evolv-green);
+}
+
+.nav-item.active svg {
+  color: var(--evolv-green);
+  filter: drop-shadow(0 0 8px var(--evolv-green-glow));
+  transform: translateY(-3px); 
+}
+
+@media screen and (max-height: 600px) {
+  .bottom-nav {
+    display: none !important;
+  }
+}

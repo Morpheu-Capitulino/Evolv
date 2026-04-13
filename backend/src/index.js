@@ -7,7 +7,7 @@ import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@as-integrations/express4';
 
 // Importa os Controladores REST
-import { register, login } from './controllers/authController.js';
+import { register, login, changePassword } from './controllers/authController.js';
 
 // Importa o GraphQL
 import { typeDefs } from './graphql/typeDefs.js';
@@ -21,17 +21,15 @@ app.use(express.json());
 // Conexão com o MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('🔥 MongoDB Conectado!'))
-  .catch(err => console.error(err));
+  .catch(err => console.error('Erro no MongoDB:', err));
 
-// Rotas REST (AuthController)
 app.post('/api/auth/register', register);
 app.post('/api/auth/login', login);
+app.post('/api/auth/change-password', changePassword);
 
-// Configuração do Apollo Server
 const server = new ApolloServer({ typeDefs, resolvers });
 await server.start();
 
-// Middleware do GraphQL
 app.use('/graphql', expressMiddleware(server, {
   context: async ({ req }) => {
     const authHeader = req.headers.authorization || '';
@@ -47,7 +45,8 @@ app.use('/graphql', expressMiddleware(server, {
   },
 }));
 
+// Inicia o Servidor
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`API rodando na porta ${PORT}`);
+  console.log(`🚀 API do Evolv rodando na porta ${PORT}`);
 });
