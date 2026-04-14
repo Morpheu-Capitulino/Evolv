@@ -66,6 +66,7 @@ export default function OnboardingPage() {
         }
       });
 
+      // Grava o objetivo e foco no perfil do utilizador
       await updateUser({
         variables: { id: userId, goal: respostas.objetivo, focus: respostas.foco }
       });

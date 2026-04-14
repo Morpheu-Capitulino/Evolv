@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, gql } from '@apollo/client';
 import { Play, TrendingUp, Activity, Flame, Trophy, Users, Target, Dumbbell } from 'lucide-react';
@@ -12,6 +12,7 @@ const GET_HOME_DATA = gql`
       name
       exercisesCompleted
       focus
+      goal
       friendIds
     }
   }
@@ -22,6 +23,20 @@ export default function HomePage() {
 
   // Busca dados reais do usuário logado usando o Token
   const { data, loading } = useQuery(GET_HOME_DATA, { fetchPolicy: 'cache-and-network' });
+  
+  // ==============================================================
+  // BARREIRA DE NOVO UTILIZADOR (Redireciona para as perguntas)
+  // ==============================================================
+  useEffect(() => {
+    if (data && data.me) {
+      const { goal, focus } = data.me;
+      // Se não tiver objetivo/foco salvo, é a primeira vez dele!
+      if (!goal || !focus || goal === 'Não definido' || focus === 'Não definido' || focus === 'Geral') {
+        navigate('/onboarding');
+      }
+    }
+  }, [data, navigate]);
+
   const currentUser = data?.me;
   
   // Pega apenas o primeiro nome

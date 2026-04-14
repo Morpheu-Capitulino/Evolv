@@ -49,6 +49,21 @@ export default function TreinoPage() {
     skip: !selectedDay
   });
 
+  // ==============================================================
+  // BARREIRA DE NOVO UTILIZADOR (Garante que responde às perguntas)
+  // ==============================================================
+  useEffect(() => {
+    if (data && data.me) {
+      const { goal, focus } = data.me;
+      if (!goal || !focus || goal === 'Não definido' || focus === 'Não definido' || focus === 'Geral') {
+        navigate('/onboarding');
+      }
+    }
+  }, [data, navigate]);
+
+  // ==============================================================
+  // CONFIGURAÇÃO DOS DIAS DA SEMANA
+  // ==============================================================
   useEffect(() => {
     const days = [];
     const hoje = new Date();
@@ -68,6 +83,9 @@ export default function TreinoPage() {
     setDiasSemana(days);
   }, []);
 
+  // =========================================================================
+  // O CORAÇÃO DA EVOLV AI: MESCLAGEM DE OBJETIVOS E NECESSIDADES
+  // =========================================================================
   useEffect(() => {
     if (data?.getAllExercises && diasSemana.length > 0) {
       const getId = (nome) => data.getAllExercises.find(e => e.name === nome)?.id || "";
@@ -99,7 +117,7 @@ export default function TreinoPage() {
       const objetivo = data.me?.goal || 'Hipertrofia'; 
       const foco = data.me?.focus || 'Superiores';
       
-      // 2. O QUE O CORPO PRECISA:
+      // 2. O QUE O CORPO PRECISA (Avaliação da IA baseada nas medidas reais):
       const m = data.getMyMeasurements && data.getMyMeasurements.length > 0 ? data.getMyMeasurements[0] : null;
       let deficit = 'A';
       let necessidadeText = 'desenvolver membros superiores';
@@ -116,17 +134,22 @@ export default function TreinoPage() {
           necessidadeText = 'focar nos membros inferiores';
         }
       }
+
+      // Traduz o "Foco" do utilizador para a Aba certa do Treino
+      let abaFoco = 'A';
+      if (foco === 'Inferiores') abaFoco = 'C';
+      if (foco === 'Core') abaFoco = 'D';
       
       const schedule = {};
       diasSemana.forEach((d, i) => {
         // 3. A MESCLAGEM INTELIGENTE: Alterna dia sim, dia não, entre a Necessidade e o Desejo (Foco)
-        const tab = i % 2 === 0 ? deficit : (foco === 'Superiores' ? 'A' : 'B');
+        const tab = i % 2 === 0 ? deficit : abaFoco;
         
         let msg = "Plano híbrido de evolução contínua.";
         if (i === 0) {
-          msg = `Evolv AI Coach: O teu objetivo é **${objetivo}** com foco em **${foco}**. Mesclando isso com a necessidade atual do teu corpo, o plano de hoje foi estruturado para **${necessidadeText}**.`;
+          msg = `Evolv AI Coach: O teu objetivo é **${objetivo}** com foco em **${foco}**. Mesclando com a necessidade do teu corpo, o plano de hoje foca em **${necessidadeText}**.`;
         } else if (i === 1) {
-          msg = `Evolv AI Coach: Amanhã voltaremos ao teu foco principal em força e técnica.`;
+          msg = `Evolv AI Coach: Amanhã voltaremos a trabalhar o teu foco principal (${foco}).`;
         }
         
         schedule[d.fullDate] = { tab, msg };
@@ -138,6 +161,9 @@ export default function TreinoPage() {
     }
   }, [data, diasSemana, selectedDay]);
 
+  // ==============================================================
+  // TEMPORIZADOR DE TREINO E FUNÇÕES AUXILIARES
+  // ==============================================================
   useEffect(() => {
     let interval;
     if (isStarted) interval = setInterval(() => setTimeElapsed(prev => prev + 1), 1000);
