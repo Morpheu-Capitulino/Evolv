@@ -23,6 +23,15 @@ const DELETE_WORKOUT_LOG = gql`
   }
 `;
 
+const FINISH_WORKOUT = gql`
+  mutation FinishWorkout($exerciseCount: Int!) {
+    finishWorkout(exerciseCount: $exerciseCount) {
+      id
+      exercisesCompleted
+    }
+  }
+`;
+
 export default function SeriesRecord() {
   const navigate = useNavigate();
   const { id: exId } = useParams();
@@ -43,10 +52,10 @@ export default function SeriesRecord() {
   const [isResting, setIsResting] = useState(false); 
   const [concluido, setConcluido] = useState(false);
 
-
   const { data, loading } = useQuery(GET_EX_FOR_RECORD, { variables: { id: exId } });
   const [saveWorkout, { loading: saving }] = useMutation(CREATE_WORKOUT);
   const [deleteLog] = useMutation(DELETE_WORKOUT_LOG);
+  const [finishWorkoutMutation] = useMutation(FINISH_WORKOUT);
 
   const insightIA = data?.getExerciseInsights;
 
@@ -66,7 +75,7 @@ export default function SeriesRecord() {
       const response = await saveWorkout({
         variables: {
           input: {
-            workoutDate: new Date().toISOString().split('T')[0], 
+            workoutDate: new Date().toISOString().split('T')[0],
             logs: [{ exerciseId: exId, sets: 1, reps, weight: parseFloat(peso) }]
           }
         }
@@ -81,6 +90,7 @@ export default function SeriesRecord() {
         setSerieAtual(serieAtual + 1);
         setIsResting(true); 
       } else {
+        await finishWorkoutMutation({ variables: { exerciseCount: 1 } });
         setConcluido(true);
       }
     } catch (err) {
@@ -102,7 +112,7 @@ export default function SeriesRecord() {
     }
   };
 
-  if (loading) return <div className="series-record-page center-all" style={{color:'var(--evolv-green)'}}><Activity className="spin" /> A carregar IA...</div>;
+  if (loading) return <div className="series-record-page center-all" style={{color:'var(--evolv-green)'}}><Activity className="spin" /></div>;
 
   return (
     <div className="series-record-page fade-in">
