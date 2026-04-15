@@ -16,81 +16,87 @@ Este projeto foi configurado para funcionar imediatamente. **O banco de dados es
 
 ---
 
-### 1 Passo: Configurar o Backend (Servidor)
+### 1️ Passo: Configurar o Backend (Servidor)
 Abra um terminal na pasta `backend`:
 
 1. Instale as dependências:
    ```bash
    npm install
-Inicie o servidor:
+   ```
 
-Bash
-npm run dev
-Porta: http://localhost:8080
+2. Inicie o servidor:
+   ```bash
+   npm run dev
+   ```
+   * **Porta:** `http://localhost:8080`
+   * **Confirmação:** Aguarde a mensagem `🔥 MongoDB Conectado!` e `🚀 API do Evolv rodando na porta 8080`.
 
-Confirmação: Aguarde a mensagem 🔥 MongoDB Conectado! e 🚀 API do Evolv rodando na porta 8080.
+---
 
-2️ Passo: Configurar o Frontend (Interface)
-Abra um segundo terminal na pasta frontend:
+### 2️ Passo: Configurar o Frontend (Interface)
+Abra um segundo terminal na pasta `frontend`:
 
-Instale as dependências:
+1. Instale as dependências:
+   ```bash
+   npm install
+   ```
 
-Bash
-npm install
-Inicie a aplicação:
+2. Inicie a aplicação:
+   ```bash
+   npm run dev
+   ```
+   * **Acesso:** Abra o navegador em `http://localhost:5173`.
 
-Bash
-npm run dev
-Acesso: Abra o navegador em http://localhost:5173.
+> **Nota PWA:** Para testar a instalação no telemóvel, utilize o Chrome (Android) ou Safari (iOS) e selecione a opção "Adicionar ao Ecrã Principal".
 
-Nota PWA: Para testar a instalação no telemóvel, utilize o Chrome (Android) ou Safari (iOS).
+---
 
-🛠️ Stack Tecnológica
-Backend (Node.js & GraphQL)
-Runtime: Node.js (ES Modules)
+## Stack Tecnológica
 
-Framework: Express.js
+### Backend (Node.js & GraphQL)
+* **Runtime:** Node.js (ES Modules)
+* **Framework:** Express.js
+* **API:** Apollo Server (GraphQL v5) + `@as-integrations/express4`
+* **Banco de Dados:** MongoDB Atlas (DBaaS na Nuvem)
+* **Segurança:** Autenticação JWT com opção "Manter Conectado" e Criptografia BcryptJS
 
-API: Apollo Server (GraphQL v5) + @as-integrations/express4
+### Frontend (React & PWA)
+* **Framework:** React.js via Vite
+* **Cliente API:** Apollo Client (GraphQL)
+* **PWA:** Vite PWA Plugin (Instalável e com suporte offline)
+* **UI/UX:** Design Glassmorphism (Midnight Blue & Gold), Ícones via Lucide-React
 
-Banco de Dados: MongoDB Atlas (DBaaS na Nuvem)
+---
 
-Segurança: Autenticação JWT com opção "Manter Conectado" e Criptografia BcryptJS.
+## Domínios de Negócio & Funcionalidades
 
-Frontend (React & PWA)
-Framework: React.js via Vite
+* ** Autenticação Inteligente (REST):** Login com checkbox "Manter conectado" que estende a validade do token para 30 dias, adaptado para a persistência do iOS.
+* ** Checklist de Treino Automatizado (GraphQL):** O sistema marca o exercício como concluído automaticamente assim que deteta o envio de uma carga para o banco de dados.
+* ** AI Coach (IA Híbrida):** Algoritmo que analisa medidas corporais e objetivos (Hipertrofia/Cutting) para sugerir a rotina de treino ideal (A, B, C ou D).
+* ** Evolução & Performance:** Registo de séries, repetições e carga com cálculo automático de 1RM e histórico detalhado.
+* ** Social:** Sistema de amizades para conexão entre utilizadores da plataforma (Gamificação e Ranking).
 
-Cliente API: Apollo Client (GraphQL)
+---
 
-PWA: Vite PWA Plugin (Instalável e com suporte a offline)
+## Arquitetura do Projeto
 
-UI/UX: Design Glassmorphism (Midnight Blue & Gold), Ícones via Lucide-React.
-
-Domínios de Negócio & Funcionalidades
-Autenticação Inteligente (REST): Login com checkbox "Manter conectado" que estende a validade do token para 30 dias, adaptado para a persistência do iOS.
-
-Checklist de Treino Automatizado (GraphQL): O sistema marca o exercício como concluído automaticamente assim que deteta o envio de uma carga para o banco de dados.
-
-AI Coach (IA Híbrida): Algoritmo que analisa medidas corporais e objetivos (Hipertrofia/Cutting) para sugerir a rotina de treino ideal (A, B, C ou D).
-
-Evolução & Performance: Registro de séries, repetições e carga com cálculo automático de 1RM e histórico detalhado.
-
-Social: Sistema de amizades para conexão entre usuários da plataforma.
-
-Arquitetura do Projeto
-Plaintext
-backend/
-├── .env                     # Variáveis de ambiente (Incluso para avaliação)
-├── src/
-│   ├── index.js             # Ponto de entrada (Express/Apollo)
-│   ├── controllers/         # Lógica REST para auth
-│   ├── graphql/             # typeDefs e resolvers
-│   └── models/              # Schemas Mongoose (User, Workout, Exercise, etc.)
+```plaintext
+evolv-app/
+├── backend/
+│   ├── .env                     # Variáveis de ambiente (Incluso para avaliação)
+│   ├── src/
+│   │   ├── index.js             # Ponto de entrada (Express/Apollo)
+│   │   ├── controllers/         # Lógica REST para auth
+│   │   ├── graphql/             # typeDefs e resolvers
+│   │   └── models/              # Schemas Mongoose (User, Workout, Exercise, etc.)
 │
-frontend/
-├── public/                  # Logos e Assets do PWA
-├── src/
-│   ├── components/          # Componentes globais
-│   ├── pages/               # Ecrãs da aplicação
-│   └── lib/                 # Configuração do Apollo Client
-└── vite.config.js           # Configuração de PWA e Build
+└── frontend/
+    ├── public/                  # Logos e Assets do PWA
+    ├── src/
+    │   ├── components/          # Componentes globais
+    │   ├── pages/               # Ecrãs da aplicação
+    │   ├── styles/              # CSS Modules global
+    │   └── App.jsx              # Configuração do Apollo Client e Rotas
+    └── vite.config.js           # Configuração de PWA e Build
+```
+```
