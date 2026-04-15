@@ -2,30 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, gql } from '@apollo/client';
 import { 
-  CheckCircle2, Circle, ChevronRight, Play, Dumbbell, 
-  Clock, BrainCircuit, Activity, Calendar as CalendarIcon,
-  History, Square
+  CheckCircle2, Circle, ChevronRight, Dumbbell, 
+  BrainCircuit, Activity, Calendar as CalendarIcon,
+  History, X, Flame, AlertTriangle, Trophy
 } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
 import '../styles/TreinoPage.css';
 
 const GET_TREINO_DATA = gql`
-  query GetTreinoData($userId: ID!, $date: String!) {
+  query GetTreinoData($userId: ID!) {
     getMyMeasurements { id weight bodyFatPercentage arm waist thigh hip date }
     getAllExercises { id name }
-    me { id focus goal trainingDays }
-    getUserWorkouts(userId: $userId, date: $date) {
-      logs { exerciseId weight reps sets }
-    }
+    me { id focus goal trainingDays isPremium }
+    getUserWorkouts(userId: $userId) { workoutDate logs { exerciseId weight reps sets } }
+    getUserStreak 
   }
 `;
 
 const ROTINAS_FALLBACK = {
-  'A': { nome: 'Peito, Ombros e Tríceps', exercicios: [] },
-  'B': { nome: 'Costas e Bíceps', exercicios: [] },
-  'C': { nome: 'Pernas Completo', exercicios: [] },
-  'D': { nome: 'Core e Cardio', exercicios: [] }
+  'A': { nome: 'Carregando...', exercicios: [] }
 };
 
 export default function TreinoPage() {
@@ -39,31 +35,20 @@ export default function TreinoPage() {
   const [activeTab, setActiveTab] = useState('A');
   const [rotinas, setRotinas] = useState(ROTINAS_FALLBACK); 
   const [aiSchedule, setAiSchedule] = useState(null);
-  const [isStarted, setIsStarted] = useState(false);
-  const [timeElapsed, setTimeElapsed] = useState(0);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  
+  const [treinoScore, setTreinoScore] = useState(0);
+  const [alertaInteligente, setAlertaInteligente] = useState(null);
 
-  const { data, loading } = useQuery(GET_TREINO_DATA, {
-    variables: { userId, date: selectedDay || new Date().toISOString().split('T')[0] },
-    fetchPolicy: 'cache-and-network',
-    skip: !selectedDay
-  });
+  const { data, loading } = useQuery(GET_TREINO_DATA, { variables: { userId }, fetchPolicy: 'cache-and-network' });
 
-  // ==============================================================
-  // BARREIRA DE NOVO UTILIZADOR (Garante que responde às perguntas)
-  // ==============================================================
   useEffect(() => {
     if (data && data.me) {
       const { goal, focus } = data.me;
-      if (!goal || !focus || goal === 'Não definido' || focus === 'Não definido' || focus === 'Geral') {
-        navigate('/onboarding');
-      }
+      if (!goal || !focus || goal === 'Não definido' || focus === 'Não definido' || focus === 'Geral') navigate('/onboarding');
     }
   }, [data, navigate]);
 
-  // ==============================================================
-  // CONFIGURAÇÃO DOS DIAS DA SEMANA
-  // ==============================================================
   useEffect(() => {
     const days = [];
     const hoje = new Date();
@@ -71,132 +56,143 @@ export default function TreinoPage() {
     setTodayDate(hojeFormatado);
     setSelectedDay(hojeFormatado);
 
-    for (let i = 0; i <= 4; i++) {
+    for (let i = -2; i <= 2; i++) { 
       const d = new Date(hoje);
       d.setDate(hoje.getDate() + i);
       days.push({ 
         dia: d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').charAt(0).toUpperCase() + d.toLocaleDateString('pt-BR', { weekday: 'short' }).substring(1,3), 
         numero: d.getDate(), 
-        fullDate: d.toISOString().split('T')[0] 
+        fullDate: d.toISOString().split('T')[0],
+        isPast: i < 0
       });
     }
     setDiasSemana(days);
   }, []);
 
-  // =========================================================================
-  // O CORAÇÃO DA EVOLV AI: MESCLAGEM DE OBJETIVOS E NECESSIDADES
-  // =========================================================================
   useEffect(() => {
     if (data?.getAllExercises && diasSemana.length > 0) {
       const getId = (nome) => data.getAllExercises.find(e => e.name === nome)?.id || "";
-      
-      const baseRotinas = {
-        'A': { nome: 'Peito, Ombros e Tríceps', exercicios: [
-          { id: getId('Supino Reto'), nome: 'Supino Reto', detalhe: '4 Séries • 8-12 Reps' },
-          { id: getId('Supino Inclinado'), nome: 'Supino Inclinado', detalhe: '3 Séries • 10-12 Reps' },
-          { id: getId('Desenvolvimento'), nome: 'Desenvolvimento', detalhe: '4 Séries • 10 Reps' },
-          { id: getId('Tríceps Pulley'), nome: 'Tríceps Pulley', detalhe: '4 Séries • 10-15 Reps' },
-        ]},
-        'B': { nome: 'Costas e Bíceps', exercicios: [
-          { id: getId('Puxada Frente'), nome: 'Puxada Frente', detalhe: '4 Séries • 10-12 Reps' },
-          { id: getId('Remada Curvada'), nome: 'Remada Curvada', detalhe: '4 Séries • 8-10 Reps' },
-          { id: getId('Rosca Direta'), nome: 'Rosca Direta', detalhe: '3 Séries • 12 Reps' },
-        ]},
-        'C': { nome: 'Pernas Completo', exercicios: [
-          { id: getId('Agachamento Livre'), nome: 'Agachamento Livre', detalhe: '4 Séries • 8-10 Reps' },
-          { id: getId('Leg Press 45'), nome: 'Leg Press 45', detalhe: '4 Séries • 12-15 Reps' },
-          { id: getId('Cadeira Extensora'), nome: 'Cadeira Extensora', detalhe: '3 Séries • 12-15 Reps' },
-        ]},
-        'D': { nome: 'Core e Cardio', exercicios: [
-          { id: getId('Abdominal Máquina'), nome: 'Abdominal Máquina', detalhe: '4 Séries • 20 Reps' },
-          { id: getId('Levantamento Terra'), nome: 'Levantamento Terra', detalhe: '4 Séries • 8 Reps' },
-        ]}
-      };
+      const focoStr = data.me?.focus || 'Superiores|Intermediário|3_dias';
+      const diasPorSemana = focoStr.includes('3_dias') ? 3 : (focoStr.includes('6_dias') ? 6 : 4);
+      const isPro = data.me?.isPremium;
 
-      // 1. O QUE O ALUNO QUER MELHORAR:
-      const objetivo = data.me?.goal || 'Hipertrofia'; 
-      const foco = data.me?.focus || 'Superiores';
-      
-      // 2. O QUE O CORPO PRECISA (Avaliação da IA baseada nas medidas reais):
-      const m = data.getMyMeasurements && data.getMyMeasurements.length > 0 ? data.getMyMeasurements[0] : null;
-      let deficit = 'A';
-      let necessidadeText = 'desenvolver membros superiores';
-      
-      if (m) {
-        if (m.bodyFatPercentage > 18) {
-          deficit = 'D';
-          necessidadeText = 'queima de gordura e fortalecimento do core';
-        } else if (m.arm < 36) {
-          deficit = 'A';
-          necessidadeText = 'desenvolver membros superiores';
-        } else {
-          deficit = 'C';
-          necessidadeText = 'focar nos membros inferiores';
-        }
+      let baseRotinas = {};
+      if (diasPorSemana === 3) {
+        baseRotinas = {
+          'A': { nome: 'Full Body (Força)', exercicios: [
+            { id: getId('Agachamento Livre'), nome: 'Agachamento Livre', detalhe: '4 Séries • 6-8 Reps' },
+            { id: getId('Supino Reto'), nome: 'Supino Reto', detalhe: '4 Séries • 6-8 Reps' },
+            { id: getId('Remada Curvada'), nome: 'Remada Curvada', detalhe: '4 Séries • 8-10 Reps' },
+          ]},
+          'B': { nome: 'Full Body (Hipertrofia)', exercicios: [
+            { id: getId('Leg Press 45'), nome: 'Leg Press 45', detalhe: '3 Séries • 12-15 Reps' },
+            { id: getId('Supino Inclinado'), nome: 'Supino Inclinado', detalhe: '3 Séries • 10-12 Reps' },
+            { id: getId('Puxada Frente'), nome: 'Puxada Frente', detalhe: '3 Séries • 10-12 Reps' },
+          ]}
+        };
+      } else {
+        baseRotinas = { 
+          'A': { nome: 'Push (Peito, Ombro, Tríceps)', exercicios: [
+            { id: getId('Supino Reto'), nome: 'Supino Reto', detalhe: '4 Séries • 8-12 Reps' },
+            { id: getId('Desenvolvimento'), nome: 'Desenvolvimento', detalhe: '4 Séries • 10 Reps' },
+            { id: getId('Tríceps Pulley'), nome: 'Tríceps Pulley', detalhe: '4 Séries • 10-15 Reps' },
+          ]},
+          'B': { nome: 'Pull (Costas e Bíceps)', exercicios: [
+            { id: getId('Puxada Frente'), nome: 'Puxada Frente', detalhe: '4 Séries • 10-12 Reps' },
+            { id: getId('Rosca Direta'), nome: 'Rosca Direta', detalhe: '3 Séries • 12 Reps' },
+          ]},
+          'C': { nome: 'Legs (Pernas Completas)', exercicios: [
+            { id: getId('Agachamento Livre'), nome: 'Agachamento Livre', detalhe: '4 Séries • 8-10 Reps' },
+            { id: getId('Cadeira Extensora'), nome: 'Cadeira Extensora', detalhe: '3 Séries • 12-15 Reps' },
+          ]}
+        };
       }
 
-      // Traduz o "Foco" do utilizador para a Aba certa do Treino
-      let abaFoco = 'A';
-      if (foco === 'Inferiores') abaFoco = 'C';
-      if (foco === 'Core') abaFoco = 'D';
-      
+      let scoreCalculado = 0;
+      if (data.getUserWorkouts) {
+        const treinosPassados = data.getUserWorkouts;
+        scoreCalculado = treinosPassados.length * 150; 
+        
+        const fezPernaRecentemente = treinosPassados.slice(0, 7).some(w => w.logs.some(l => l.exerciseId === getId('Agachamento Livre') || l.exerciseId === getId('Leg Press 45')));
+        if (!fezPernaRecentemente) setAlertaInteligente("Atenção: Não regista treinos de membros inferiores há mais de 7 dias.");
+      }
+      setTreinoScore(scoreCalculado);
+
+      const weekMsg = isPro ? "Semana 2: Foco em sobrecarga progressiva (Média/Alta)." : "Desbloqueie a Periodização Automática com o Plano PRO.";
+
       const schedule = {};
       diasSemana.forEach((d, i) => {
-        // 3. A MESCLAGEM INTELIGENTE: Alterna dia sim, dia não, entre a Necessidade e o Desejo (Foco)
-        const tab = i % 2 === 0 ? deficit : abaFoco;
-        
-        let msg = "Plano híbrido de evolução contínua.";
-        if (i === 0) {
-          msg = `Evolv AI Coach: O teu objetivo é **${objetivo}** com foco em **${foco}**. Mesclando com a necessidade do teu corpo, o plano de hoje foca em **${necessidadeText}**.`;
-        } else if (i === 1) {
-          msg = `Evolv AI Coach: Amanhã voltaremos a trabalhar o teu foco principal (${foco}).`;
-        }
-        
-        schedule[d.fullDate] = { tab, msg };
+        const tab = i % 2 === 0 ? 'A' : (diasPorSemana === 3 ? 'B' : 'C'); 
+        schedule[d.fullDate] = { tab, msg: i === 2 ? `Evolv AI: Split adaptado para ${diasPorSemana} dias. ${weekMsg}` : "Sessão planeada para recuperação muscular otimizada." };
       });
 
       setAiSchedule(schedule);
       setRotinas(baseRotinas);
-      if (schedule[selectedDay]) setActiveTab(schedule[selectedDay].tab);
+
+      const manualTab = sessionStorage.getItem('evolv_tab_' + selectedDay);
+      if (manualTab && baseRotinas[manualTab]) setActiveTab(manualTab);
+      else if (schedule[selectedDay]) setActiveTab(schedule[selectedDay].tab);
+
     }
   }, [data, diasSemana, selectedDay]);
 
-  // ==============================================================
-  // TEMPORIZADOR DE TREINO E FUNÇÕES AUXILIARES
-  // ==============================================================
-  useEffect(() => {
-    let interval;
-    if (isStarted) interval = setInterval(() => setTimeElapsed(prev => prev + 1), 1000);
-    return () => clearInterval(interval);
-  }, [isStarted]);
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    sessionStorage.setItem('evolv_tab_' + selectedDay, tab);
+  };
 
   const verificarConcluido = (exId) => {
     if (!data?.getUserWorkouts) return false;
-    return data.getUserWorkouts.some(w => w.logs.some(l => l.exerciseId === exId));
+    return data.getUserWorkouts.filter(w => w.workoutDate.startsWith(selectedDay)).some(w => w.logs.some(l => l.exerciseId === exId));
   };
 
-  const formatTime = (s) => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+  const getHistoricoAgrupado = () => {
+    if (!data?.getUserWorkouts || !data?.getAllExercises) return [];
+    const map = {};
+    data.getUserWorkouts.forEach(w => {
+      const dateKey = w.workoutDate.split('T')[0];
+      if (!map[dateKey]) map[dateKey] = new Set();
+      w.logs.forEach(l => {
+        const ex = data.getAllExercises.find(e => e.id === l.exerciseId);
+        if (ex) map[dateKey].add(ex.name);
+      });
+    });
+    return Object.keys(map).sort((a,b) => new Date(b) - new Date(a)).map(d => ({ date: d, exercises: Array.from(map[d]) }));
+  };
 
-  if (loading && rotinas === ROTINAS_FALLBACK) return <div className="center-all" style={{color:'#fff'}}><Activity className="spin" /> A sincronizar Evolv AI...</div>;
+  if (loading && rotinas === ROTINAS_FALLBACK) return <div className="center-all"><Activity className="spin" color="var(--evolv-green)" /></div>;
+  const historico = getHistoricoAgrupado();
 
   return (
     <div className="treino-page fade-in">
-      <Header 
-        title="O Seu Treino" 
-        rightIcon={<CalendarIcon size={22} color="var(--evolv-green)" />} 
-        onRightIconClick={() => setShowHistoryModal(true)} 
-      />
+      <Header title="O Seu Treino" rightIcon={<CalendarIcon size={22} color="var(--evolv-green)" />} onRightIconClick={() => setShowHistoryModal(true)} />
 
       <div className="treino-content main-scroll">
+        
+        <div className="gamification-bar" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 10px', marginBottom: '15px'}}>
+          <div style={{display: 'flex', alignItems: 'center', gap: '5px', color: '#ffaa00'}}><Flame size={18} fill="#ffaa00"/> <strong style={{color:'#fff'}}>3 <span style={{fontSize:'0.7rem', color:'var(--text-muted)'}}>Streak</span></strong></div>
+          <div style={{display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(58, 181, 74, 0.1)', padding: '4px 10px', borderRadius: '15px', border: '1px solid var(--evolv-green)'}}>
+            <Trophy size={14} color="var(--evolv-green)"/> <span style={{color: 'var(--evolv-green)', fontWeight: 'bold', fontSize: '0.85rem'}}>Score: {treinoScore}</span>
+          </div>
+        </div>
+
         <div className="calendar-strip">
           {diasSemana.map((item) => (
-            <div key={item.fullDate} className={`calendar-day ${selectedDay === item.fullDate ? 'active' : ''}`} onClick={() => setSelectedDay(item.fullDate)}>
+            <div key={item.fullDate} className={`calendar-day ${selectedDay === item.fullDate ? 'active' : ''} ${item.isPast ? 'past-day' : ''}`} onClick={() => setSelectedDay(item.fullDate)}>
               <span className="day-name">{item.dia}</span>
               <span className="day-number">{item.numero}</span>
+              {historico.some(h => h.date === item.fullDate) && <div className="done-dot" style={{width: '4px', height: '4px', background: 'var(--evolv-green)', borderRadius: '50%', marginTop: '2px'}}></div>}
               {item.fullDate === todayDate && <div className="active-dot"></div>}
             </div>
           ))}
         </div>
+
+        {alertaInteligente && (
+          <div className="glass-card danger fade-in" style={{padding: '12px', margin: '15px 0', borderLeft: '4px solid #ff4d4d', display: 'flex', alignItems: 'center', gap: '10px'}}>
+            <AlertTriangle color="#ff4d4d" size={20} flexShrink={0} />
+            <p style={{margin: 0, fontSize: '0.85rem', color: '#fff'}}>{alertaInteligente}</p>
+          </div>
+        )}
 
         {aiSchedule?.[selectedDay] && (
           <div className="ai-recommendation-banner fade-in">
@@ -205,19 +201,10 @@ export default function TreinoPage() {
           </div>
         )}
 
-        {isStarted && selectedDay === todayDate && (
-          <div className="glass-card dashboard-card active-dash fade-in">
-            <div className="dash-top">
-              <div className="timer-display"><Clock size={22} color="var(--evolv-green)" /><span className="time pulse-text">{formatTime(timeElapsed)}</span></div>
-              <button className="action-circle-btn btn-pause" onClick={() => setIsStarted(false)}><Square fill="#000" size={18} /></button>
-            </div>
-          </div>
-        )}
-
-        <div className="workout-tabs">
-          {['A', 'B', 'C', 'D'].map(l => (
-            <button key={l} className={`tab-btn ${activeTab === l ? 'active' : ''}`} onClick={() => setActiveTab(l)}>
-              {l} {aiSchedule?.[selectedDay]?.tab === l && <span className="ai-star">★</span>}
+        <div className="workout-tabs" style={{marginTop: '20px'}}>
+          {Object.keys(rotinas).map(l => (
+            <button key={l} className={`tab-btn ${activeTab === l ? 'active' : ''}`} onClick={() => handleTabClick(l)}>
+              Treino {l} {aiSchedule?.[selectedDay]?.tab === l && <span className="ai-star">★</span>}
             </button>
           ))}
         </div>
@@ -232,11 +219,11 @@ export default function TreinoPage() {
             {rotinas[activeTab].exercicios.map((ex) => {
               const concluidoReal = verificarConcluido(ex.id);
               return (
-                <div key={ex.id} className={`glass-card exercicio-item ${concluidoReal ? 'concluido' : ''}`} onClick={() => navigate(`/detalhes/${ex.id}`)}>
+                <div key={ex.id} className={`glass-card exercicio-item ${concluidoReal ? 'concluido' : ''}`} onClick={() => navigate(`/detalhes/${ex.id}`, { state: { detalhe: ex.detalhe } })}>
                   <div className="ex-icon">{concluidoReal ? <CheckCircle2 size={30} color="var(--evolv-green)" fill="rgba(58, 181, 74, 0.2)" /> : <Circle size={30} color="var(--border-glass)" />}</div>
                   <div className="ex-info">
                     <h3 style={{ textDecoration: concluidoReal ? 'line-through' : 'none' }}>{ex.nome}</h3>
-                    <span className="detalhe-treino">{concluidoReal ? "✓ Registado" : ex.detalhe}</span>
+                    <span className="detalhe-treino">{concluidoReal ? "✓ Checklist Concluído" : ex.detalhe}</span>
                   </div>
                   <ChevronRight size={20} color="var(--text-muted)" />
                 </div>
@@ -244,30 +231,34 @@ export default function TreinoPage() {
             })}
           </div>
         )}
-
-        <div className="treino-actions">
-          {selectedDay === todayDate && !isStarted && (
-            <button className="green-button start-btn" onClick={() => setIsStarted(true)}><Play fill="#000" size={20} /> INICIAR TREINO</button>
-          )}
-        </div>
         <div className="spacer"></div>
       </div>
 
       {showHistoryModal && (
         <div className="modal-overlay" onClick={() => setShowHistoryModal(false)}>
           <div className="data-input-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header-pro"><h3><History size={20} /> Dias Treinados</h3></div>
-            <div className="modal-body-scroll main-scroll" style={{maxHeight: '350px'}}>
-              {data?.me?.trainingDays?.length > 0 ? (
-                [...data.me.trainingDays].reverse().map((dia, i) => (
-                  <div key={i} className="glass-card" style={{padding: '15px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '12px', borderLeft: '3px solid var(--evolv-green)'}}>
-                    <CheckCircle2 color="var(--evolv-green)" size={20} />
-                    <span style={{color: '#fff', fontWeight: 'bold'}}>{new Date(`${dia}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</span>
+            <div className="modal-header-pro" style={{justifyContent: 'space-between'}}>
+              <h3 style={{display: 'flex', alignItems: 'center', gap: '8px'}}><History size={18} color="var(--evolv-green)"/> Diário de Treino</h3>
+              <button className="icon-btn-close" onClick={() => setShowHistoryModal(false)}><X size={22} /></button>
+            </div>
+            
+            <div className="modal-body-scroll main-scroll" style={{maxHeight: '60vh', padding: '10px'}}>
+              {historico.length > 0 ? (
+                historico.map((hist, i) => (
+                  <div key={i} className="glass-card" style={{padding: '15px', marginBottom: '15px', borderLeft: '3px solid var(--evolv-green)'}}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '8px'}}>
+                      <CalendarIcon size={16} color="var(--evolv-green)" />
+                      <strong style={{color: '#fff', fontSize: '1rem'}}>{new Date(`${hist.date}T12:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: '20px', color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.6' }}>
+                      {hist.exercises.map((exName, idx) => (
+                        <li key={idx}>{exName}</li>
+                      ))}
+                    </ul>
                   </div>
                 ))
-              ) : <p style={{textAlign:'center', color:'var(--text-muted)'}}>Sem histórico.</p>}
+              ) : <p style={{textAlign:'center', color:'var(--text-muted)', marginTop: '20px'}}>Ainda não concluiu nenhum exercício. Comece hoje mesmo!</p>}
             </div>
-            <button className="btn-cancel-modal-pro full-width" style={{marginTop:'15px'}} onClick={() => setShowHistoryModal(false)}>FECHAR</button>
           </div>
         </div>
       )}

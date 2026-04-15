@@ -33,23 +33,19 @@ export default function PerfilPage() {
     foco: 'Corpo Todo' 
   });
   
-  // Modais
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   
-  // Formulários
   const [editForm, setEditForm] = useState({ nome: '', email: '' });
   const [passForm, setPassForm] = useState({ atual: '', nova: '', confirmar: '' });
   
-  // Visibilidade de Senhas
   const [showPassAtual, setShowPassAtual] = useState(false);
   const [showPassNova, setShowPassNova] = useState(false);
 
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success'); 
 
-  // BUSCA OS DADOS REAIS DO BANCO
   const { loading } = useQuery(GET_PROFILE_DATA, {
     fetchPolicy: 'network-only',
     onCompleted: (data) => {
@@ -84,7 +80,6 @@ export default function PerfilPage() {
     updateUser({ variables: { id: userId, name: editForm.nome, email: editForm.email } });
   };
 
-  // LÓGICA DE ALTERAÇÃO DE SENHA (SEGURANÇA RESTAURADA)
   const handleSavePassword = async () => {
     if (!passForm.atual || !passForm.nova || !passForm.confirmar) {
       return mostrarAviso("Preencha todas as senhas.", "error");
@@ -98,7 +93,6 @@ export default function PerfilPage() {
 
     try {
       const token = localStorage.getItem('evolv_token');
-      // Utiliza o VITE_API_URL para manter o projeto Plug & Play
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
       await axios.post(`${API_URL}/api/auth/change-password`, {
         userId,
@@ -146,7 +140,6 @@ export default function PerfilPage() {
 
       <div className="treino-content main-scroll">
         
-        {/* CARTÃO PRINCIPAL DO UTILIZADOR */}
         <div className="glass-card user-main-card">
           <div className={`user-avatar-large ${userData.isPremium ? 'premium-glow' : ''}`}>
             {loading ? '...' : userData.nome.charAt(0)}
@@ -161,7 +154,6 @@ export default function PerfilPage() {
           </div>
         </div>
 
-        {/* ESTATÍSTICAS RÁPIDAS */}
         <div className="quick-stats-row fade-in">
           <div className="glass-card q-stat"><span className="q-label">Treinos</span><strong className="q-value">42</strong></div>
           <div className="glass-card q-stat"><span className="q-label">Sequência</span><strong className="q-value">5 <small>dias</small></strong></div>

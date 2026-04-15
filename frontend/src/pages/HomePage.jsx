@@ -21,16 +21,11 @@ const GET_HOME_DATA = gql`
 export default function HomePage() {
   const navigate = useNavigate();
 
-  // Busca dados reais do usuário logado usando o Token
   const { data, loading } = useQuery(GET_HOME_DATA, { fetchPolicy: 'cache-and-network' });
   
-  // ==============================================================
-  // BARREIRA DE NOVO UTILIZADOR (Redireciona para as perguntas)
-  // ==============================================================
   useEffect(() => {
     if (data && data.me) {
       const { goal, focus } = data.me;
-      // Se não tiver objetivo/foco salvo, é a primeira vez dele!
       if (!goal || !focus || goal === 'Não definido' || focus === 'Não definido' || focus === 'Geral') {
         navigate('/onboarding');
       }
@@ -39,10 +34,8 @@ export default function HomePage() {
 
   const currentUser = data?.me;
   
-  // Pega apenas o primeiro nome
   const primeiroNome = currentUser?.name?.split(' ')[0] || 'Atleta';
 
-  // Dados 100% reais do Banco de Dados
   const totalExercicios = currentUser?.exercisesCompleted || 0;
   const focoAtual = currentUser?.focus || 'Geral';
   const totalAmigos = currentUser?.friendIds?.length || 0;

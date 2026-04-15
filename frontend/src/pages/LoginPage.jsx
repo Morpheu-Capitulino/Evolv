@@ -12,7 +12,6 @@ export default function LoginPage() {
   const [erro, setErro] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Estados PWA e Sessão
   const [keepConnected, setKeepConnected] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstallable, setIsInstallable] = useState(false);
@@ -71,7 +70,6 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="overlay"></div>
       
-      {/* O CARD PRINCIPAL (Vidro) */}
       <div className="login-content fade-in">
         
         <div className="header-logo-section">
@@ -147,7 +145,6 @@ export default function LoginPage() {
   );
 }
 
-// Ícone SVG personalizado para a Checkbox Premium
 const CheckSquareModern = () => (
   <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M1 5L4.5 8.5L11 1.5" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

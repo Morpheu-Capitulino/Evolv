@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { useQuery, gql } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink, useQuery, gql } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage'; 
@@ -14,6 +15,25 @@ import PerfilPage from './pages/PerfilPage';
 import OnboardingPage from './pages/OnboardingPage';
 import './styles/App.css';
 
+const httpLink = createHttpLink({
+  uri: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/graphql` : 'http://localhost:8080/graphql',
+});
+
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('evolv_token');
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : "",
+    }
+  }
+});
+
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache()
+});
+
 const VERIFY_TOKEN = gql`
   query VerifyToken {
     me { id }
@@ -24,13 +44,13 @@ function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
   const token = localStorage.getItem('evolv_token');
+  
   const { error } = useQuery(VERIFY_TOKEN, {
     skip: !token, 
     fetchPolicy: 'network-only' 
   });
 
   useEffect(() => {
-
     if (location.pathname === '/' || location.pathname === '/register') return;
 
     if (!token || error) {
@@ -67,8 +87,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <ApolloProvider client={client}>
+      <Router>
+        <AppContent />
+      </Router>
+    </ApolloProvider>
   );
 }
