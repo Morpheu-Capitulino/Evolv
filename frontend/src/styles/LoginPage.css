@@ -1,6 +1,3 @@
-/* ============================================================ */
-/* FUNDO E ESTRUTURA GERAL */
-/* ============================================================ */
 .login-page {
   height: 100vh;
   display: flex;
@@ -62,9 +59,6 @@
   margin: 0;
 }
 
-/* ============================================================ */
-/* FORMULÁRIO E INPUTS */
-/* ============================================================ */
 .login-form {
   width: 100%;
 }
@@ -123,9 +117,6 @@
   width: 100%;
 }
 
-/* ============================================================ */
-/* CHECKBOX PREMIUM */
-/* ============================================================ */
 .keep-connected-wrapper {
   display: flex;
   align-items: center;
@@ -166,9 +157,6 @@
   border-color: rgba(58, 181, 74, 0.5);
 }
 
-/* ============================================================ */
-/* BOTÕES E LINKS */
-/* ============================================================ */
 .button-container {
   width: 100%;
 }
@@ -187,41 +175,18 @@
   margin-left: 5px;
 }
 
-/* ============================================================ */
-/* CARDS DE INSTALAÇÃO PWA */
-/* ============================================================ */
-.pwa-install-card {
+.pwa-install-banner {
   display: flex;
+  align-items: center;
   gap: 15px;
-  padding: 16px; 
+  padding: 16px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 25px;
-  width: 100%; 
-  box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.03);
-  align-items: center; 
-}
-
-.pwa-install-card.ios-compact {
-  flex-direction: row; 
-  text-align: left;
-  position: relative;
-  background: rgba(58, 181, 74, 0.05); 
-  border-color: rgba(58, 181, 74, 0.15);
-}
-
-.pwa-install-card.ios {
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  position: relative;
-}
-
-.pwa-install-card.android {
   background: rgba(58, 181, 74, 0.05);
-  border-color: rgba(58, 181, 74, 0.2);
-  align-items: center;
+  border: 1px solid rgba(58, 181, 74, 0.2);
+  position: relative;
+  margin-bottom: 25px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .close-pwa-btn {
@@ -232,80 +197,56 @@
   border: none;
   cursor: pointer;
   padding: 4px;
-  display: flex;
 }
 
 .pwa-icon-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 .pwa-text-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px; 
-  padding-right: 15px; 
+  gap: 4px;
 }
 
 .pwa-text-content strong {
   color: #fff;
-  font-size: 0.95rem; 
+  font-size: 0.95rem;
   font-weight: 700;
 }
 
 .pwa-text-content p {
   color: #aaa;
-  font-size: 0.75rem; 
-  line-height: 1.3;
+  font-size: 0.75rem;
   margin: 0;
+  line-height: 1.3;
 }
 
-.ios-steps-modern {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 15px;
-  width: 100%;
-}
-
-.step-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 10px 15px;
-  border-radius: 10px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.step-number {
-  width: 22px;
-  height: 22px;
+.btn-install-action {
   background: var(--evolv-green, #3ab54a);
   color: #000;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.75rem;
   font-weight: 800;
-  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 0 15px rgba(58, 181, 74, 0.3);
   flex-shrink: 0;
 }
 
-.step-item span:not(.step-number) {
-  flex: 1;
-  color: #fff;
-  font-size: 0.8rem;
-  text-align: left;
+.fade-in {
+  animation: fadeIn 0.4s ease-in;
 }
 
-.pwa-btn-sm {
-  padding: 10px 15px !important;
-  font-size: 0.75rem !important;
-  border-radius: 10px !important;
-  width: auto !important;
-  flex-shrink: 0;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

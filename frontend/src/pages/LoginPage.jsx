@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, Share, PlusSquare, Download, X } from 'lucide-react';
+import { User, Lock, Share, Download, X } from 'lucide-react';
 import axios from 'axios';
 import GreenButton from '../components/GreenButton';
 import '../styles/LoginPage.css';
@@ -77,9 +77,8 @@ export default function LoginPage() {
           <p className="evolv-tagline">Treino Híbrido & Competição</p>
         </div>
 
-       {/* AVISO IOS/SAFARI */}
         {showIOSPrompt && (
-          <div className="pwa-install-card ios-compact fade-in">
+          <div className="pwa-install-banner ios-banner fade-in">
             <button className="close-pwa-btn" onClick={() => setShowIOSPrompt(false)}>
               <X size={16} color="rgba(255,255,255,0.4)" />
             </button>
@@ -87,29 +86,27 @@ export default function LoginPage() {
               <Download size={24} color="var(--evolv-green, #3ab54a)" />
             </div>
             <div className="pwa-text-content">
-              <strong>Instale a App Evolv</strong>
+              <strong>Instalar App Evolv</strong>
               <p>Clique em <Share size={12} style={{display:'inline', verticalAlign:'middle'}}/> e selecione <strong>Adicionar ao Ecrã Principal</strong>.</p>
             </div>
           </div>
         )}
 
-        {/* BOTÃO ANDROID/CHROME */}
         {isInstallable && (
-          <div className="pwa-install-card android fade-in">
+          <div className="pwa-install-banner android-banner fade-in">
              <div className="pwa-icon-wrapper">
               <Download size={28} color="var(--evolv-green, #3ab54a)" />
             </div>
             <div className="pwa-text-content">
               <strong>Instalar App Evolv</strong>
-              <p style={{fontSize:'0.8rem'}}>Aceda aos seus treinos com um clique.</p>
+              <p>Aceda aos seus treinos com um clique.</p>
             </div>
-            <button className="green-button start-btn pwa-btn-sm" onClick={handleInstallAndroid}>
-              <Download size={18} color="#000" /> INSTALAR
+            <button className="btn-install-action" onClick={handleInstallAndroid}>
+              <Download size={14} color="#000" /> INSTALAR
             </button>
           </div>
         )}
 
-        {/* FORMULÁRIO */}
         <form className="login-form" onSubmit={handleLogin}>
           {erro && <div className="error-msg">{erro}</div>}
           
@@ -123,7 +120,6 @@ export default function LoginPage() {
             <input type="password" placeholder="Palavra-passe" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
 
-          {/* CHECKBOX PREMIUM */}
           <div className="keep-connected-wrapper" onClick={() => setKeepConnected(!keepConnected)}>
             <div className={`modern-checkbox ${keepConnected ? 'checked' : ''}`}>
               {keepConnected && <CheckSquareModern />}
