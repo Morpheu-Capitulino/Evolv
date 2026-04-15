@@ -27,7 +27,9 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await axios.post('http://localhost:8080/api/auth/register', {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      
+      await axios.post(`${API_URL}/api/auth/register`, {
         name: formData.name,
         email: formData.email,
         password: formData.password
