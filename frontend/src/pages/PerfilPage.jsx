@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, gql } from '@apollo/client';
-import { LogOut, Settings, Target, Flame, Dumbbell, Activity, ShieldCheck, ChevronRight } from 'lucide-react';
+import { LogOut, Settings, Target, Flame, Dumbbell, Activity, ShieldCheck, ChevronRight, Lock, X } from 'lucide-react';
+import axios from 'axios';
 import BottomNav from '../components/BottomNav';
 import '../styles/App.css'; 
 
@@ -27,10 +28,47 @@ export default function PerfilPage() {
   const navigate = useNavigate();
   const { data, loading } = useQuery(GET_PROFILE_DATA, { fetchPolicy: 'cache-and-network' });
 
+  const [showPwdModal, setShowPwdModal] = useState(false);
+  const [pwdData, setPwdData] = useState({ current: '', new: '', confirm: '' });
+  const [pwdStatus, setPwdStatus] = useState({ error: '', success: '', loading: false });
+
   const handleLogout = () => {
     localStorage.removeItem('evolv_token');
     localStorage.removeItem('evolv_userId');
     navigate('/');
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setPwdStatus({ error: '', success: '', loading: true });
+
+    if (pwdData.new !== pwdData.confirm) {
+      return setPwdStatus({ error: 'As novas palavras-passe não coincidem.', success: '', loading: false });
+    }
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const token = localStorage.getItem('evolv_token');
+      const userId = localStorage.getItem('evolv_userId');
+
+      await axios.post(`${API_URL}/api/auth/change-password`, {
+        userId,
+        currentPassword: pwdData.current,
+        newPassword: pwdData.new
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setPwdStatus({ error: '', success: 'Palavra-passe alterada com sucesso!', loading: false });
+      setPwdData({ current: '', new: '', confirm: '' });
+      setTimeout(() => setShowPwdModal(false), 2000);
+    } catch (err) {
+      setPwdStatus({ 
+        error: err.response?.data?.error || 'Erro ao tentar alterar a palavra-passe.', 
+        success: '', 
+        loading: false 
+      });
+    }
   };
 
   if (loading) return <div className="center-all"><Activity className="spin" color="var(--evolv-green)" size={40}/></div>;
@@ -121,9 +159,78 @@ export default function PerfilPage() {
 
       </div>
 
+      <h3 style={{ color: '#fff', fontSize: '1rem', marginBottom: '15px' }}>Segurança</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '30px' }}>
+        <div className="glass-card" onClick={() => setShowPwdModal(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', cursor: 'pointer' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '12px' }}><Lock size={20} color="#fff" /></div>
+            <div>
+              <strong style={{ color: '#fff', fontSize: '0.95rem', display: 'block' }}>Alterar Palavra-passe</strong>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Mantenha a sua conta segura</span>
+            </div>
+          </div>
+          <ChevronRight size={20} color="var(--text-muted)" />
+        </div>
+      </div>
+
       <button onClick={handleLogout} style={{ width: '100%', background: 'rgba(255, 77, 77, 0.1)', border: '1px solid rgba(255, 77, 77, 0.3)', color: '#ff4d4d', padding: '16px', borderRadius: '14px', fontSize: '0.95rem', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
         <LogOut size={20} /> TERMINAR SESSÃO
       </button>
+
+      {showPwdModal && (
+        <div className="modal-overlay" onClick={() => setShowPwdModal(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+          <div className="glass-card" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: '400px', padding: '25px', position: 'relative' }}>
+            
+            <button onClick={() => setShowPwdModal(false)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+              <X size={24} />
+            </button>
+
+            <h3 style={{ color: '#fff', margin: '0 0 20px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Lock color="var(--evolv-green)" /> Alterar Palavra-passe
+            </h3>
+
+            {pwdStatus.error && <div style={{ background: 'rgba(255, 77, 77, 0.1)', border: '1px solid rgba(255, 77, 77, 0.3)', color: '#ff4d4d', padding: '10px', borderRadius: '8px', fontSize: '0.85rem', marginBottom: '15px', textAlign: 'center' }}>{pwdStatus.error}</div>}
+            {pwdStatus.success && <div style={{ background: 'rgba(58, 181, 74, 0.1)', border: '1px solid rgba(58, 181, 74, 0.3)', color: 'var(--evolv-green)', padding: '10px', borderRadius: '8px', fontSize: '0.85rem', marginBottom: '15px', textAlign: 'center' }}>{pwdStatus.success}</div>}
+
+            <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div>
+                <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '5px' }}>Palavra-passe Atual</label>
+                <input 
+                  type="password" 
+                  value={pwdData.current} 
+                  onChange={(e) => setPwdData({...pwdData, current: e.target.value})} 
+                  style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '10px', color: '#fff', outline: 'none' }} 
+                  required 
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '5px' }}>Nova Palavra-passe</label>
+                <input 
+                  type="password" 
+                  value={pwdData.new} 
+                  onChange={(e) => setPwdData({...pwdData, new: e.target.value})} 
+                  style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '10px', color: '#fff', outline: 'none' }} 
+                  required 
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '5px' }}>Confirmar Nova Palavra-passe</label>
+                <input 
+                  type="password" 
+                  value={pwdData.confirm} 
+                  onChange={(e) => setPwdData({...pwdData, confirm: e.target.value})} 
+                  style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '10px', color: '#fff', outline: 'none' }} 
+                  required 
+                />
+              </div>
+              
+              <button type="submit" disabled={pwdStatus.loading} style={{ background: 'var(--evolv-green)', color: '#000', border: 'none', padding: '14px', borderRadius: '10px', fontWeight: 'bold', marginTop: '10px', cursor: 'pointer' }}>
+                {pwdStatus.loading ? 'A PROCESSAR...' : 'GUARDAR ALTERAÇÕES'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       <BottomNav />
     </div>
