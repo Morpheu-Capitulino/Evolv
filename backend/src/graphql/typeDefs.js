@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server-express';
+import gql from 'graphql-tag';
 
 export const typeDefs = gql`
   type User {
@@ -76,7 +76,6 @@ export const typeDefs = gql`
   }
 
   input CreateWorkoutInput {
-    userId: ID # Mantido por segurança no front, mas o back usa o Token
     workoutDate: String
     logs: [WorkoutLogInput]!
   }
@@ -88,9 +87,9 @@ export const typeDefs = gql`
     getAllExercises: [Exercise]
     getExercise(id: ID!): Exercise
     getMyMeasurements: [Measurement]
-    getUserMeasurements(userId: ID): [Measurement]
+    getUserMeasurements: [Measurement]
     compareMeasurements(m1Id: ID!, m2Id: ID!): ComparisonResult
-    getUserWorkouts(userId: ID, date: String): [Workout]
+    getUserWorkouts(date: String): [Workout]
     
     # NOVAS ROTAS DE DADOS AVANÇADOS
     getExerciseProgression(exerciseId: ID!): [ProgressionData]
@@ -99,9 +98,9 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    updateUser(id: ID!, name: String, email: String, goal: String, focus: String): User
+    updateUser(name: String, email: String, goal: String, focus: String): User
     deleteUser(id: ID!): Boolean
-    addMeasurement(userId: ID, weight: Float!, bodyFatPercentage: Float!): Measurement
+    addMeasurement(weight: Float!, bodyFatPercentage: Float!): Measurement
     addBodyMeasurement(weight: Float!, height: Float!, bodyFatPercentage: Float!, arm: Float, waist: Float, thigh: Float, hip: Float): Measurement
     addFriend(userId: ID!, friendId: ID!): User
     sendFriendRequest(userId: ID!, targetId: ID!): User
@@ -109,7 +108,7 @@ export const typeDefs = gql`
     createExercise(name: String!, muscleGroup: String!, videoUrl: String): Exercise
     
     # ROTAS DE TREINO ATUALIZADAS
-    finishWorkout(userId: ID, exerciseCount: Int!, duration: Int, totalVolume: Float): User
+    finishWorkout(exerciseCount: Int!, duration: Int, totalVolume: Float): User
     createWorkout(input: CreateWorkoutInput!): Workout
     deleteWorkoutLog(workoutId: ID!, logIndex: Int!): Workout
   }

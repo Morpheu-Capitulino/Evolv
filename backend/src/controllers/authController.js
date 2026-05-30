@@ -37,7 +37,11 @@ export const login = async (req, res) => {
     const tempoExpiracao = keepConnected ? '30d' : '24h';
     
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: tempoExpiracao });
-    return res.status(200).json({ token, userId: user._id });
+    res.status(200).json({ 
+      token, 
+      userId: user._id,
+      onboardingCompleted: user.onboardingCompleted || false
+    });
   } catch (error) {
     return res.status(500).json({ error: "Erro no login" });
   }

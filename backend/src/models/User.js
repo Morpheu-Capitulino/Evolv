@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   trainingDays: [{ type: String }],
   goal: { type: String, default: 'Não definido' },   
   focus: { type: String, default: 'Geral' },       
+  isPremium: { type: Boolean, default: false },
   
   createdAt: { type: Date, default: Date.now }
 });

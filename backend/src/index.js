@@ -47,6 +47,7 @@ app.use('/graphql', expressMiddleware(server, {
 
 // Inicia o Servidor
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`🚀 API do Evolv rodando na porta ${PORT}`);
+// A injeção de '0.0.0.0' obriga o servidor a receber pacotes externos
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 API do Evolv exposta na rede local (porta ${PORT})`);
 });

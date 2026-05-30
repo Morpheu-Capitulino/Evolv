@@ -1,0 +1,29 @@
+# =========================================
+# React Native / Expo - Gitignore
+# =========================================
+
+# Dependências (Obrigatório ignorar, a professora vai fazer npm install)
+node_modules/
+npm-debug.*
+yarn-error.log
+yarn-debug.log
+
+# Pastas de Build e Cache do Expo
+.expo/
+dist/
+web-build/
+.cache/
+
+# Ficheiros de Sistema (Mac/Windows)
+.DS_Store
+Thumbs.db
+*.log
+
+# =========================================
+# VARIÁVEIS DE AMBIENTE (NOTA IMPORTANTE)
+# =========================================
+# O ficheiro .env.local e outros devem ser ignorados.
+.env.local
+.env.development
+.env.test
+.env.production

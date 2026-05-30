@@ -22,8 +22,10 @@ export const resolvers = {
     getAllExercises: async () => await Exercise.find(),
     
     getUserWorkouts: async (_, { date }, context) => {
-      if (!context.userId) throw new Error("Acesso negado.");
-      const filter = { userId: context.userId };
+      if (!context.userId) throw new Error("Não autenticado.");
+      
+      // Usa o ID que veio do Token, ignorando qualquer tentativa de passar ID via argumento
+      const filter = { userId: context.userId }; 
       if (date) filter.workoutDate = date;
       return await Workout.find(filter).sort({ workoutDate: -1 });
     },
@@ -154,9 +156,15 @@ export const resolvers = {
       return workout;
     },
 
-    updateUser: async (_, { id, name, email, goal, focus }, context) => {
-      if (id !== context.userId) throw new Error("Operação não permitida.");
-      return await User.findByIdAndUpdate(id, { $set: { name, email, goal, focus } }, { new: true });
+    // Em resolvers.js (Mutation)
+    updateUser: async (_, { name, email, goal, focus }, context) => {
+      if (!context.userId) throw new Error("Acesso negado.");
+      
+      return await User.findByIdAndUpdate(
+        context.userId, // Usa estritamente o ID verificado pelo Token
+        { $set: { name, email, goal, focus, onboardingCompleted: true } }, 
+        { new: true }
+      );
     },
 
     finishWorkout: async (_, { exerciseCount, duration, totalVolume }, context) => {
