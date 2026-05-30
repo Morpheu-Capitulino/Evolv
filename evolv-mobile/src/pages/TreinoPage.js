@@ -59,7 +59,6 @@ const GET_TREINO_DATA = gql`
       isPremium
     }
 
-    # REMOVIDO o (userId: $userId). Agora o backend pega pelo Token automaticamente!
     getUserWorkouts {
       workoutDate
       logs {
