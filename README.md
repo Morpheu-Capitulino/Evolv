@@ -56,9 +56,10 @@ Navegue até a pasta do projeto mobile:
 ```bash
 cd evolv-mobile
 ```
-Crie ou edite o arquivo .env na raiz da pasta evolv-mobile/ e configure o IP da API de acordo com o seu ambiente de testes:
+```text
+Edite o arquivo .env na raiz da pasta evolv-mobile/ e configure o IP da API de acordo com o seu ambiente de testes:
+```
 
-Plaintext
 # Para testar em emuladores no computador (Android Studio / Xcode):
 EXPO_PUBLIC_API_URL=http://localhost:8080
 
