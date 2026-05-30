@@ -42,17 +42,20 @@ O aplicativo superou o requisito mínimo de 3 telas e já conta com um ecossiste
 ## Passo 1: Configurar e Rodar o Backend
 Abra o seu terminal, navegue até a pasta do servidor e instale as dependências:
 
-Bash
+```bash
 cd backend
 npm install
 npm start
+````
+
 O servidor GraphQL e a conexão com o MongoDB serão iniciados na porta http://localhost:8080/graphql.
 
 ## Passo 2: Configurar as Variáveis de Ambiente do Mobile
 Navegue até a pasta do projeto mobile:
 
-Bash
+```bash
 cd evolv-mobile
+```
 Crie ou edite o arquivo .env na raiz da pasta evolv-mobile/ e configure o IP da API de acordo com o seu ambiente de testes:
 
 Plaintext
@@ -65,9 +68,10 @@ EXPO_PUBLIC_API_URL=[http://192.168.1.](http://192.168.1.)X:8080
 ## Passo 3: Iniciar o Aplicativo Mobile
 Instale os pacotes necessários e inicie o gerenciador de pacotes do Expo:
 
-Bash
+```bash
 npm install
 npx expo start
+```
 Celular Físico: Baixe o aplicativo Expo Go na Google Play Store ou App Store e escaneie o código QR exibido no terminal. (Certifique-se de que o computador e o celular estão conectados na mesma rede Wi-Fi).
 
 Emulador: Pressione a tecla a para abrir no emulador Android ou i para o simulador iOS.
