@@ -45,7 +45,7 @@ Abra o seu terminal, navegue até a pasta do servidor e instale as dependências
 ```bash
 cd backend
 npm install
-npm start
+npm run dev
 ````
 
 O servidor GraphQL e a conexão com o MongoDB serão iniciados na porta http://localhost:8080/graphql.
